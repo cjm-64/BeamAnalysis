@@ -34,7 +34,7 @@ testDataFiltered = filterTestData(testDataRaw, 30);
 testDataCentered = centerData(testDataFiltered);
 
 %% Apply Calibration
-testDataCalibrated = [testDataCentered(:,1)*rightEyeCalibration testDataCentered(:,2)*leftEyeCalibration];
+testDataCalibrated = [testDataCentered(:,1)/rightEyeCalibration testDataCentered(:,2)/leftEyeCalibration];
 
 %% Subtract Left form Right
 finalData = abs(testDataCalibrated(:,1) - testDataCalibrated(:,2));
