@@ -52,7 +52,7 @@ deviationMagnitudes = getDeviationMagnitudes(finalData, deviationStartAndEnds);
 %% Save Data
 finalCoeffs = array2table([rightEyeCalibrationCoeffs leftEyeCalibrationCoeffs], "VariableNames",["rightEyeCalibrationCoeffs", "leftEyeCalibrationCoeffs"]);
 finalDeviations = array2table([deviationStartAndEnds deviationLengths deviationMagnitudes], 'VariableNames',["deviationStart", "deviationEnds", "deviationLengthFrames", "deviationLengthTime", "deviationMagnitude", "deviationMagLocations"]);
-save(input("Enter file name (no extension): ", "s"), "finalCoeffs", "testDataRaw", "testDataFiltered", "testDataCentered", "testDataCalibrated", "finalData", "finalDeviations");
+save(input("Enter file name (no extension): ", "s"), "finalCoeffs", "testDataRaw", "testDataFiltered", "testDataCentered", "testDataCalibrated", "finalData", "finalDeviations", "time",  "threshold");
 
 %% Plot
 

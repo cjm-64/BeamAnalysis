@@ -54,8 +54,8 @@ toc
 %% Save Data
 finalCoeffs = array2table([rightEyeCalibrationCoeffs leftEyeCalibrationCoeffs], "VariableNames",["rightEyeCalibrationCoeffs", "leftEyeCalibrationCoeffs"]);
 finalDeviations = array2table([deviationStartAndEnds deviationLengths deviationMagnitudes], 'VariableNames',["deviationStart", "deviationEnds", "deviationLengthFrames", "deviationLengthTime", "deviationMagnitude", "deviationMagLocations"]);
-save(input("Enter file name (no extension): ", "s"), "finalCoeffs", "testDataRaw", "testDataFiltered", "testDataCentered", "testDataCalibrated", "finalData", "finalDeviations");
-%% Plot
+save(input("Enter file name (no extension): ", "s"), "finalCoeffs", "testDataRaw", "testDataFiltered", "testDataCentered", "testDataCalibrated", "finalData", "finalDeviations", "time",  "threshold");
+%% Plot steps
 
 figure()
 subplot (2,2,1)
@@ -86,6 +86,8 @@ plot(time, testDataCalibrated(:,2), 'b')
 title("Calibrated")
 legend("Right Eye", "Left Eye")
 
+%% Plot data with deviations
+
 figure()
 plot(time, finalData,'b')
 hold on
@@ -97,6 +99,8 @@ xlabel('time (s)')
 ylabel('prism diopters')
 title('Short recording of IXT patient with deviations')
 legend('Deviation Amount','Threshold','Deviation Onset', 'Deviation End', 'Max deviation', 'Location','northwest')
+
+%% Plot histogram
 
 figure()
 histogram(finalData, 'BinWidth', 5, 'FaceColor', 'c')
