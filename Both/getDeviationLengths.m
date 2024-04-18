@@ -4,5 +4,5 @@ function deviationLengths = getDeviationLengths(deviations)
         deviationLengths(i, 1) = deviations(i,2) - deviations(i,1);
     end
     deviationLengths(deviationLengths(:,1) == 0) = 1;
-    deviationLengths(:, 2) = deviationLengths(:,1)*(1/30);
+    deviationLengths(:, 2) = deviationLengths(:,1)*(1/71);
 end

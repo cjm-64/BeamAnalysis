@@ -1,4 +1,4 @@
-function importedData = importBEAMData(filename, dataLines)
+function [importedData, fileName] = importBEAMData(filename, dataLines)
 %IMPORTFILE Import data from a text file
 %  OCT26 = IMPORTFILE(FILENAME) reads data from text file FILENAME for
 %  the default selection.  Returns the data as a table.
@@ -43,5 +43,5 @@ opts = setvaropts(opts, "Header", "EmptyFieldRule", "auto");
 
 % Import the data
 importedData = readtable(filename, opts);
-
+fileName = filename;
 end

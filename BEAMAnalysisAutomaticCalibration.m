@@ -3,7 +3,7 @@ clear all; close all; clc
 %% Script to analyze BEAM data
 
 %% Load File
-importedData = importBEAMData(uigetfile('.csv'));
+[importedData, fileName] = importBEAMData(uigetfile('.csv'));
 numericData = table2array(importedData(:,2:6));
 
 tic
@@ -21,14 +21,22 @@ testDataRaw = numericData(headerLocs(7):headerLocs(8), [1 3]);
 %% Create time vector
 time = getTime(headers, size(testDataRaw,1));
 
+%% Save to preproccesed folder
+fileName = 
+% save(strcat('Preprocessed/', , '.mat'), "numericData", "headers", "headerLocs", "calibrationRaw", "testDataRaw", "time")
+
+%% Filter Calibration Data
+calibrationDataFiltered = filterBEAMData(calibrationRaw, 35);
+% calibrationDataFiltered = calibrationRaw;
+
 %% Calibrate
-rightEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationRaw(:,1:2:11)));
+rightEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,1:2:11)));
 rightEyeCalibration = mean(rightEyeCalibrationCoeffs);
-leftEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationRaw(:,2:2:12)));
+leftEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,2:2:12)));
 leftEyeCalibration = mean(leftEyeCalibrationCoeffs);
 
 %% Filter Data
-testDataFiltered = filterTestData(testDataRaw, 35);
+testDataFiltered = filterBEAMData(testDataRaw, 35);
 
 %% Center Data
 testDataCentered = centerData(testDataFiltered);
@@ -40,11 +48,12 @@ testDataCalibrated = [testDataCentered(:,1)/rightEyeCalibration testDataCentered
 finalData = abs(testDataCalibrated(:,1)) - abs(testDataCalibrated(:,2));
 
 %% Locate Deviations
-threshold = 5;
+threshold = 15;
 deviationStartAndEnds = getDeviations(finalData, threshold)';
 
 %% Calculate Deviation Length
 deviationLengths = getDeviationLengths(deviationStartAndEnds);
+sum(deviationLengths(:,2))
 
 %% Calculate Deviation Magnitudes
 deviationMagnitudes = getDeviationMagnitudes(finalData, deviationStartAndEnds);

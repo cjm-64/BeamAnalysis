@@ -1,7 +1,7 @@
 clear all; close all; clc
 
 %% Load File
-importedData = importedBEAMData(uigetfile('.csv'));
+importedData = importBEAMData(uigetfile('.csv'));
 numericData = table2array(importedData(:,2:6));
 
 %% Find where to split
@@ -18,17 +18,21 @@ testDataRaw = numericData(headerLocs(7):headerLocs(8), [1 3]);
 %% Create time vector
 time = getTime(headers, size(testDataRaw,1));
 
+%% Filter Calibration Data
+calibrationDataFiltered = filterBEAMData(calibrationRaw, 35);
+% calibrationDataFiltered = calibrationRaw;
+
 %% Plot
-calibrationLimits = CoG_getCalibrationLimits(calibrationRaw);
+calibrationLimits = CoG_getCalibrationLimits(calibrationDataFiltered);
 
 %% Get Calibration Coeffs
-rightEyeCalibrationCoeffs = abs(CoG_getCalibrationCoeffs(calibrationLimits(:,1:2:11), calibrationRaw(:,1:2:11)))';
+rightEyeCalibrationCoeffs = abs(CoG_getCalibrationCoeffs(calibrationLimits(:,1:2:11), calibrationDataFiltered(:,1:2:11)))';
 rightEyeCalibration = mean(rightEyeCalibrationCoeffs);
-leftEyeCalibrationCoeffs = abs(CoG_getCalibrationCoeffs(calibrationLimits(:,2:2:12), calibrationRaw(:,2:2:12)))';
+leftEyeCalibrationCoeffs = abs(CoG_getCalibrationCoeffs(calibrationLimits(:,2:2:12), calibrationDataFiltered(:,2:2:12)))';
 leftEyeCalibration = mean(rightEyeCalibrationCoeffs);
 
-%% Filter Data
-testDataFiltered = filterTestData(testDataRaw, 30);
+%% Filter Test Data
+testDataFiltered = filterBEAMData(testDataRaw, 35);
 
 %% Center Data
 testDataCentered = centerData(testDataFiltered);

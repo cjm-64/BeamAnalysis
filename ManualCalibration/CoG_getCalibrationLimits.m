@@ -7,7 +7,9 @@ function calibrationLimits = CoG_getCalibrationLimits(calibrationRaw)
     startXLine = xline(1, 'g');
     endXLine = xline(size(calibrationRaw(:,1), 1), 'm');
     for i = 1:size(calibrationRaw, 2)
-    
+%         if max(calibrationRaw(:,i))-min(calibrationRaw(:,i)) < 3
+%             
+%         end
         lineLocation = 1;
         startAndEndLocations = [1 93];
         button = 0;
