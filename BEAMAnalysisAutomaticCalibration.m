@@ -9,20 +9,17 @@ clear all; close all; clc
 %% Split into calibraiton data nd test data
 [calibrationDataRaw, testDataRaw] = splitBEAMData(importedData, fileName);
 
-%% Filter Calibration Data
-% calibrationDataFiltered = filterBEAMData(calibrationRaw, 35);
-% calibrationDataFiltered = calibrationRaw;
+%% Filter Data
+[calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw);
+% plotCalVSFiltered(calibrationDataRaw, calibrationDataFiltered)
 
-calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
-
-%% Calibrate
+%% Get calibration coeffs
 rightEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,1:2:11)));
 rightEyeCalibration = mean(rightEyeCalibrationCoeffs);
 leftEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,2:2:12)));
 leftEyeCalibration = mean(leftEyeCalibrationCoeffs);
 
-%% Filter Data
-testDataFiltered = filterBEAMData(testDataRaw, 35);
+
 
 %% Center Data
 testDataCentered = centerData(testDataFiltered);
