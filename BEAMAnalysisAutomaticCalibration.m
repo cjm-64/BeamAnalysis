@@ -4,30 +4,16 @@ clear all; close all; clc
 
 %% Load File
 [importedData, fileName] = importBEAMData(uigetfile('.csv'));
-numericData = table2array(importedData(:,2:6));
 
-tic
-%% Find where to split
-[headers, headerLocs] = getHeaders(importedData.Header);
-headerLocs(length(headerLocs) + 1) = size(numericData, 1);
-
+% tic
 %% Split into calibraiton data nd test data
-% Data Organization [RightCal_5PD_RightEye_x, RightCal_5PD_LeftEye_x, R10Rx, R10Lx, R15Rx, R15Lx, L5Rx, L5Lx, L10Rx, L10Lx, L15Rx, L15Lx]
-calibrationRaw = getCalData(numericData, length(headers)-1, headerLocs);
-
-% Data Organization [RightEyeX LeftEyeX]
-testDataRaw = numericData(headerLocs(7):headerLocs(8), [1 3]);
-
-%% Create time vector
-time = getTime(headers, size(testDataRaw,1));
-
-%% Save to preproccesed folder
-fileName = 
-% save(strcat('Preprocessed/', , '.mat'), "numericData", "headers", "headerLocs", "calibrationRaw", "testDataRaw", "time")
+[calibrationDataRaw, testDataRaw] = splitBEAMData(importedData, fileName);
 
 %% Filter Calibration Data
-calibrationDataFiltered = filterBEAMData(calibrationRaw, 35);
+% calibrationDataFiltered = filterBEAMData(calibrationRaw, 35);
 % calibrationDataFiltered = calibrationRaw;
+
+calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
 
 %% Calibrate
 rightEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,1:2:11)));

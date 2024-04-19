@@ -1,10 +1,21 @@
-function calibrationSplit = getCalData(allData, colNum, headerLocations)
-    temp = allData;
-    dummy = zeros(min(diff(headerLocations)), colNum);
-    columnCount = 1;
-    for i = 1:colNum
-        dummy(:,[columnCount columnCount+1]) = temp(headerLocations(i):headerLocations(i) + min(diff(headerLocations))-1,[1 3]);
-        columnCount = columnCount + 2;
+function calibrationSplit = getCalData(allData, headerLocations)
+
+    calSide = ["rightCal", "leftCal"];
+    calMagnitude = ["fivePD", "tenPD", "fifteenPD"];
+    calEye = ["rightEye","leftEye"];
+    calAxis = ["X", "Y"];
+    
+    headerTracker = 1;
+    col = 1;
+    for side = 1:length(calSide)
+        for mag = 1:length(calMagnitude)
+            for eye = 1:length(calEye)
+                for axis = 1:length(calAxis)
+                    calibrationSplit.(calSide{side}).(calMagnitude{mag}).(calEye{eye}).(calAxis{axis}) = allData(headerLocations(headerTracker):headerLocations(headerTracker) + min(diff(headerLocations))-1, col);
+                end
+            end
+            col = 1;
+            headerTracker = headerTracker + 1;
+        end
     end
-    calibrationSplit = dummy;
 end
