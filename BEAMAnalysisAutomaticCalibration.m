@@ -10,22 +10,21 @@ clear all; close all; clc
 [calibrationDataRaw, testDataRaw] = splitBEAMData(importedData, fileName);
 
 %% Filter Data
-[calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw);
-% plotCalVSFiltered(calibrationDataRaw, calibrationDataFiltered)
+[calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw, fileName);
+% plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
+plotTypeVSType_Test(testDataRaw, testDataFiltered);
 
 %% Get calibration coeffs
-rightEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,1:2:11)));
-rightEyeCalibration = mean(rightEyeCalibrationCoeffs);
-leftEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,2:2:12)));
-leftEyeCalibration = mean(leftEyeCalibrationCoeffs);
-
-
+calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered);
 
 %% Center Data
 testDataCentered = centerData(testDataFiltered);
+plotTypeVSType_Test(testDataFiltered, testDataCentered);
 
 %% Apply Calibration
-testDataCalibrated = [testDataCentered(:,1)/rightEyeCalibration testDataCentered(:,2)/leftEyeCalibration];
+testDataCalibrated = calibrateBEAMData(testDataCentered);
+plotTypeVSType_Test(testDataCentered, testDataCalibrated);
+
 
 %% Subtract Left from Right
 finalData = abs(testDataCalibrated(:,1)) - abs(testDataCalibrated(:,2));

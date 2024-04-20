@@ -1,23 +1,39 @@
 function calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered)
     PD = [5 10 15];
+    rightCoeffs = zeros(3, 1);
+    leftCoeffs = zeros(3, 1);
     
-    sides = fieldnames(calibrationDataFiltered);
-    for side = 1:numel(sides)
-        rotationAmounts = fieldnames(calibrationDataFiltered.(sides{side}));
-        for amt = 1:numel(rotationAmounts)
-            directions = fieldnames(calibrationDataFiltered.(sides{side}).(rotationAmounts{amt}).rightEye);
-            for dir = 1:numel(directions)
-                right = mean(calibrationDataFiltered.(sides{side}).(rotationAmounts{amt}).rightEye.(directions{dir}));
-                left = mean(calibrationDataFiltered.(sides{side}).(rotationAmounts{amt}).leftEye.(directions{dir}));
-                subtracted =  right - left;
-                divBy = (PD(amt)*2)
-                coeff = subtracted/divBy;
-                calibrationCoeffs.(sides{side}).(rotationAmounts{amt}).(directions{dir}) = subtracted/(PD(amt)*2);
+    rotationAmounts = fieldnames(calibrationDataFiltered.rightCal);
+    for amt = 1:numel(rotationAmounts)
+        eyes = fieldnames(calibrationDataFiltered.rightCal.(rotationAmounts{amt}));
+        for eye = 1:numel(eyes)
+            right = mean(calibrationDataFiltered.rightCal.(rotationAmounts{amt}).(eyes{eye}).X);
+            left = mean(calibrationDataFiltered.leftCal.(rotationAmounts{amt}).(eyes{eye}).X);
+            subtracted = right - left;
+            target = PD(amt)*2;
+            if eye == 1
+                rightCoeffs(amt) = subtracted/target;
+            else
+                leftCoeffs(amt) = subtracted/target;
             end
         end
     end
-
+    calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+    calibrationCoeffs.leftEye = mean(abs(leftCoeffs));    
 end
+
+    % sides = fieldnames(calibrationDataFiltered);
+    % for side = 1:numel(sides)
+    %     rotationAmounts = fieldnames(calibrationDataFiltered.(sides{side}));
+    %     for amt = 1:numel(rotationAmounts)
+    %         right = mean(calibrationDataFiltered.(sides{side}).(rotationAmounts{amt}).rightEye.X);
+    %         left = mean(calibrationDataFiltered.(sides{side}).(rotationAmounts{amt}).leftEye.X);
+    %         subtracted = right - left;
+    %         target = PD(amt)*2;
+    %         coeff = subtracted/target;
+    %         disp([right;left;subtracted;target;coeff])
+    %     end
+    % end
 
 
 % function calibrationCoeffs = getCalibrationCoeffs(calDataRaw)
