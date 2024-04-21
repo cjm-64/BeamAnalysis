@@ -12,18 +12,18 @@ clear all; close all; clc
 %% Filter Data
 [calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw, fileName);
 % plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
-plotTypeVSType_Test(testDataRaw, testDataFiltered);
+% plotTypeVSType_Test(testDataRaw, testDataFiltered);
 
 %% Get calibration coeffs
 calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered, fileName);
 
 %% Center Data
 testDataCentered = centerData(testDataFiltered, fileName);
-plotTypeVSType_Test(testDataFiltered, testDataCentered);
+% plotTypeVSType_Test(testDataFiltered, testDataCentered);
 
 %% Apply Calibration
 testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName);
-plotTypeVSType_Test(testDataCentered, testDataCalibrated);
+% plotTypeVSType_Test(testDataCentered, testDataCalibrated);
 
 
 %% Subtract Left from Right
@@ -36,21 +36,9 @@ ylabel('Deviation (PD)')
 
 %% Locate Deviations
 threshold = 15;
-deviationStartAndEnds = getDeviations(finalData, threshold)';
+deviations = calculateDeviations(testDataFinal, threshold, fileName);
 
-%% Calculate Deviation Length
-deviationLengths = getDeviationLengths(deviationStartAndEnds);
-sum(deviationLengths(:,2))
-
-%% Calculate Deviation Magnitudes
-deviationMagnitudes = getDeviationMagnitudes(finalData, deviationStartAndEnds);
-
-
-toc
-%% Save Data
-finalCoeffs = array2table([rightEyeCalibrationCoeffs leftEyeCalibrationCoeffs], "VariableNames",["rightEyeCalibrationCoeffs", "leftEyeCalibrationCoeffs"]);
-finalDeviations = array2table([deviationStartAndEnds deviationLengths deviationMagnitudes], 'VariableNames',["deviationStart", "deviationEnds", "deviationLengthFrames", "deviationLengthTime", "deviationMagnitude", "deviationMagLocations"]);
-save(input("Enter file name (no extension): ", "s"), "finalCoeffs", "testDataRaw", "testDataFiltered", "testDataCentered", "testDataCalibrated", "finalData", "finalDeviations", "time",  "threshold");
+% toc
 %% Plot steps
 
 figure()
