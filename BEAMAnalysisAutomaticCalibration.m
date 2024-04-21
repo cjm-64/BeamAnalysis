@@ -15,19 +15,24 @@ clear all; close all; clc
 plotTypeVSType_Test(testDataRaw, testDataFiltered);
 
 %% Get calibration coeffs
-calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered);
+calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered, fileName);
 
 %% Center Data
-testDataCentered = centerData(testDataFiltered);
+testDataCentered = centerData(testDataFiltered, fileName);
 plotTypeVSType_Test(testDataFiltered, testDataCentered);
 
 %% Apply Calibration
-testDataCalibrated = calibrateBEAMData(testDataCentered);
+testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName);
 plotTypeVSType_Test(testDataCentered, testDataCalibrated);
 
 
 %% Subtract Left from Right
-finalData = abs(testDataCalibrated(:,1)) - abs(testDataCalibrated(:,2));
+testDataFinal = getFinalData(testDataCalibrated, fileName);
+figure()
+plot(testDataFinal.time, testDataFinal.X)
+title('Eye Alignment over time')
+xlabel('Time (s)')
+ylabel('Deviation (PD)')
 
 %% Locate Deviations
 threshold = 15;

@@ -1,4 +1,4 @@
-function testDataCentered = centerData(testDataFiltered)
+function testDataCentered = centerData(testDataFiltered, fileName)
    
     %% Center test data
     names = fieldnames(testDataFiltered);
@@ -13,6 +13,8 @@ function testDataCentered = centerData(testDataFiltered)
         end
     end
 
+    %% Save to filtered folder
+    save(strcat('Data/Centered/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataCentered")
     
 end
 

@@ -1,4 +1,4 @@
-function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs)
+function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName)
     
     names = fieldnames(testDataCentered);
     for name = 1:numel(names)
@@ -10,12 +10,13 @@ function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoe
             directions = fieldnames(testDataCentered.(names{name}));
             for dir = 1:numel(directions)
                 disp(dir)
-                part1 = testDataCentered.(names{name}).(directions{dir});
-                part2 = calibrationCoeffs.(names{name});
                 testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir})./calibrationCoeffs.(names{name});
             end
         end
     end
 
+    
+    %% Save to filtered folder
+    save(strcat('Data/Calibrated/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataCentered")
 
 end

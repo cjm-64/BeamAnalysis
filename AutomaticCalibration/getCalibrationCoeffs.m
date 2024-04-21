@@ -1,4 +1,4 @@
-function calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered)
+function calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered, fileName)
     PD = [5 10 15];
     rightCoeffs = zeros(3, 1);
     leftCoeffs = zeros(3, 1);
@@ -19,7 +19,11 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered)
         end
     end
     calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
-    calibrationCoeffs.leftEye = mean(abs(leftCoeffs));    
+    calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+
+    %% Save to filtered folder
+    save(strcat('Data/Coefficients/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "calibrationCoeffs")
+
 end
 
     % sides = fieldnames(calibrationDataFiltered);
