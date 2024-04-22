@@ -9,47 +9,36 @@ clear all; close all; clc
 %% Split into calibraiton data nd test data
 [calibrationDataRaw, testDataRaw] = splitBEAMData(importedData, fileName);
 
-%% Filter Calibration Data
-% calibrationDataFiltered = filterBEAMData(calibrationRaw, 35);
-% calibrationDataFiltered = calibrationRaw;
-
-calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
-
-%% Calibrate
-rightEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,1:2:11)));
-rightEyeCalibration = mean(rightEyeCalibrationCoeffs);
-leftEyeCalibrationCoeffs = abs(getCalibrationCoeffs(calibrationDataFiltered(:,2:2:12)));
-leftEyeCalibration = mean(leftEyeCalibrationCoeffs);
-
 %% Filter Data
-testDataFiltered = filterBEAMData(testDataRaw, 35);
+[calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw, fileName);
+% plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
+% plotTypeVSType_Test(testDataRaw, testDataFiltered);
+
+%% Get calibration coeffs
+calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered, fileName);
 
 %% Center Data
-testDataCentered = centerData(testDataFiltered);
+testDataCentered = centerData(testDataFiltered, fileName);
+% plotTypeVSType_Test(testDataFiltered, testDataCentered);
 
 %% Apply Calibration
-testDataCalibrated = [testDataCentered(:,1)/rightEyeCalibration testDataCentered(:,2)/leftEyeCalibration];
+testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName);
+% plotTypeVSType_Test(testDataCentered, testDataCalibrated);
+
 
 %% Subtract Left from Right
-finalData = abs(testDataCalibrated(:,1)) - abs(testDataCalibrated(:,2));
+testDataFinal = getFinalData(testDataCalibrated, fileName);
+figure()
+plot(testDataFinal.time, testDataFinal.X)
+title('Eye Alignment over time')
+xlabel('Time (s)')
+ylabel('Deviation (PD)')
 
 %% Locate Deviations
 threshold = 15;
-deviationStartAndEnds = getDeviations(finalData, threshold)';
+deviations = calculateDeviations(testDataFinal, threshold, fileName);
 
-%% Calculate Deviation Length
-deviationLengths = getDeviationLengths(deviationStartAndEnds);
-sum(deviationLengths(:,2))
-
-%% Calculate Deviation Magnitudes
-deviationMagnitudes = getDeviationMagnitudes(finalData, deviationStartAndEnds);
-
-
-toc
-%% Save Data
-finalCoeffs = array2table([rightEyeCalibrationCoeffs leftEyeCalibrationCoeffs], "VariableNames",["rightEyeCalibrationCoeffs", "leftEyeCalibrationCoeffs"]);
-finalDeviations = array2table([deviationStartAndEnds deviationLengths deviationMagnitudes], 'VariableNames',["deviationStart", "deviationEnds", "deviationLengthFrames", "deviationLengthTime", "deviationMagnitude", "deviationMagLocations"]);
-save(input("Enter file name (no extension): ", "s"), "finalCoeffs", "testDataRaw", "testDataFiltered", "testDataCentered", "testDataCalibrated", "finalData", "finalDeviations", "time",  "threshold");
+% toc
 %% Plot steps
 
 figure()

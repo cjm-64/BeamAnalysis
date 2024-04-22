@@ -1,13 +1,22 @@
-function filteredData = filterBEAMData(rawData, windowSize)
-    %prefiltering to remove gross noise
-    dummy = movmedian(rawData, windowSize, 1,'Endpoints', 'shrink');
-    [b, a] = butter(3, 1/35);
-    dummy = filtfilt(b, a, dummy);
-%     filteredData = dummy;
-
-    % Identify and remove outliers
-    dummy(isoutlier(dummy, 1)) = NaN;
+function [calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw, fileName)
     
-    % Replace NaNs with interpolated data
-    filteredData = fillmissing(dummy,'linear', 1);
+    %% Filter calibration Data
+    calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
+    
+    %% Filter test data
+    names = fieldnames(testDataRaw);
+    for name = 1:numel(names)
+        if names(name) == "time"
+            testDataFiltered.time = testDataRaw.time;
+        else
+            directions = fieldnames(testDataRaw.(names{name}));
+            for dir = 1:numel(directions)
+                testDataFiltered.(names{name}).(directions{dir}) = filterBEAMTestData(testDataRaw.(names{name}).(directions{dir}), 35);
+            end
+        end
+    end
+    
+    %% Save to filtered folder
+    save(strcat('Data/Filtered/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "calibrationDataFiltered", "testDataFiltered")
+
 end

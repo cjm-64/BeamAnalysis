@@ -12,6 +12,7 @@ function calibrationSplit = getCalData(allData, headerLocations)
             for eye = 1:length(calEye)
                 for axis = 1:length(calAxis)
                     calibrationSplit.(calSide{side}).(calMagnitude{mag}).(calEye{eye}).(calAxis{axis}) = allData(headerLocations(headerTracker):headerLocations(headerTracker) + min(diff(headerLocations))-1, col);
+                    col= col + 1;
                 end
             end
             col = 1;
