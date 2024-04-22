@@ -5,6 +5,7 @@ function testDataFinal = getFinalData(testDataCalibrated, fileName)
         testDataFinal.(directions{dir}) = testDataCalibrated.rightEye.(directions{dir}) + testDataCalibrated.leftEye.(directions{dir});
     end
     testDataFinal.time = testDataCalibrated.time;
+    testDataFinal.fps = round(length(testDataFinal.time)/(90*60));
 
 
     %% Save to processed folder

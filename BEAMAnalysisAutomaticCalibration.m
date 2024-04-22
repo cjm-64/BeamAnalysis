@@ -1,6 +1,7 @@
 clear all; close all; clc
 
 %% Script to analyze BEAM data
+makeBEAMDataLocations()
 
 %% Load File
 [importedData, fileName] = importBEAMData(uigetfile('.csv'));
@@ -41,48 +42,10 @@ deviations = calculateDeviations(testDataFinal, threshold, fileName);
 % toc
 %% Plot steps
 
-figure()
-subplot (2,2,1)
-plot(time, testDataRaw(:,1), 'r')
-hold on
-plot(time, testDataRaw(:,2), 'b')
-title("Raw Data")
-legend("Right Eye", "Left Eye")
-
-subplot (2,2,2)
-plot(time, testDataFiltered(:,1), 'r')
-hold on
-plot(time, testDataFiltered(:,2), 'b')
-title("Smoothed")
-legend("Right Eye", "Left Eye")
-
-subplot(2,2,3)
-plot(time, testDataCentered(:,1), 'r')
-hold on
-plot(time, testDataCentered(:,2), 'b')
-title("Centered")
-legend("Right Eye", "Left Eye")
-
-subplot(2,2,4)
-plot(time, testDataCalibrated(:,1), 'r')
-hold on
-plot(time, testDataCalibrated(:,2), 'b')
-title("Calibrated")
-legend("Right Eye", "Left Eye")
+plotBEAMProcessingSteps(testDataRaw, testDataFiltered, testDataCentered, testDataCalibrated)
 
 %% Plot data with deviations
 
-figure()
-plot(time, finalData,'b')
-hold on
-yline(threshold)
-plot(time(deviationStartAndEnds(:,1)), finalData(deviationStartAndEnds(:,1)), 'g*')
-plot(time(deviationStartAndEnds(:,2)), finalData(deviationStartAndEnds(:,2)), 'm*')
-plot(time(deviationMagnitudes(:,2)), deviationMagnitudes(:,1),'k*')
-xlabel('time (s)')
-ylabel('prism diopters')
-title('Short recording of IXT patient with deviations')
-legend('Deviation Amount','Threshold','Deviation Onset', 'Deviation End', 'Max deviation', 'Location','northwest')
 
 %% Plot histogram
 
