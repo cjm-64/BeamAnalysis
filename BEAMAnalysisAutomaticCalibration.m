@@ -41,19 +41,18 @@ deviations = calculateDeviations(testDataFinal, threshold, fileName);
 
 % toc
 %% Plot steps
-
 plotBEAMProcessingSteps(testDataRaw, testDataFiltered, testDataCentered, testDataCalibrated)
 
 %% Plot data with deviations
+plotBEAMFinalData(testDataFinal, deviations)
+
+%% Do Z score for histogram
+
+%% Save all data to one file
+save(strcat('Data/Final/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), '-regexp', '^(?!(importedData|threshold)$).')
 
 
-%% Plot histogram
 
-figure()
-histogram(finalData, 'BinWidth', 5, 'FaceColor', 'c')
-xlabel('Prism Diopters')
-ylabel('Frame Count')
-title('Histogram of deviation over time')
 
 
 

@@ -10,6 +10,7 @@ function deviations = calculateDeviations(testDataFinal, threshold, fileName)
             deviations.(directions{dir}).magnitude = getDeviationMagnitudes(testDataFinal.(directions{dir}), deviations.(directions{dir}).startAndEnds);
         end
     end
+    deviations.threshold = threshold;
 
     %% Save to metrics folder
     save(strcat('Data/Metrics/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataFinal")
