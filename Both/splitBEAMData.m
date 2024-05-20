@@ -1,6 +1,6 @@
 function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData, fileName)
     
-    numericData = table2array(rawData(:,2:6));
+    numericData = table2array(rawData(:,2:size(rawData,2)));
 
     %% Find where to split
     [headers, headerLocs] = getHeaders(rawData.Header);

@@ -36,7 +36,7 @@ hold off
 
 % Conditionally Check Outlier AND >20 CALIBRATED
 % NEEDS CALIBRATION CODE
-uf = (tf | abs(dummyRaw.rightEye.X)>45 | ~dummyRaw.rightEye.Found);
+uf = tf | abs(dummyRaw.rightEye.X)>45 | ~dummyRaw.rightEye.Found);
 uf = logical(uf);
 figure()
 plot(dummyRaw.time, dummyRaw.rightEye.X, 'r')
@@ -52,7 +52,7 @@ dummyRaw.rightEye.X_NaN = fillmissing(dummyRaw.rightEye.X_NaN, 'previous');
 
 % Replace Outliers with Median Left Eye
 [tf, l, u, c] = isoutlier(dummyRaw.leftEye.X);
-uf = (tf | abs(dummyRaw.leftEye.X)>45 | ~dummyRaw.leftEye.Found);
+uf = tf.*(abs(dummyRaw.leftEye.X)>45 || ~dummyRaw.leftEye.Found);
 uf = logical(uf);
 dummyRaw.leftEye.X_NaN = dummyRaw.leftEye.X;
 dummyRaw.leftEye.X_NaN(uf) = NaN;
