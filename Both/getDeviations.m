@@ -1,7 +1,7 @@
 function deviations = getDeviations(data, threshold)
     deviationCount = 1;
     isDeviated = false;
-    deviations = zeros(2,1);
+    deviations = NaN(2,1);
     for i = 1:size(data, 1)
         % Data is deviated (above threshold)
         if data(i) > threshold

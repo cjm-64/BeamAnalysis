@@ -10,25 +10,25 @@ makeBEAMDataLocations()
 %% Split into calibraiton data nd test data
 [calibrationDataRaw, testDataRaw] = splitBEAMData(importedData, fileName);
 
-%% Filter Data
-[calibrationDataFiltered, testDataFiltered] = filterBEAMData(calibrationDataRaw, testDataRaw, fileName);
-% plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
-% plotTypeVSType_Test(testDataRaw, testDataFiltered);
-
 %% Get calibration coeffs
-calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered, fileName);
+calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw, fileName);
 
 %% Center Data
-testDataCentered = centerData(testDataFiltered, fileName);
+testDataCentered = centerData(testDataRaw, fileName);
 % plotTypeVSType_Test(testDataFiltered, testDataCentered);
 
 %% Apply Calibration
 testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName);
 % plotTypeVSType_Test(testDataCentered, testDataCalibrated);
 
+%% Filter Data
+testDataFiltered = filterBEAMData(testDataCalibrated, fileName);
+% plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
+% plotTypeVSType_Test(testDataRaw, testDataFiltered);
+
 
 %% Subtract Left from Right
-testDataFinal = getFinalData(testDataCalibrated, fileName);
+testDataFinal = getFinalData(testDataFiltered, fileName);
 figure()
 plot(testDataFinal.time, testDataFinal.X)
 title('Eye Alignment over time')

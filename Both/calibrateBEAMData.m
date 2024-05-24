@@ -9,8 +9,12 @@ function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoe
         else
             directions = fieldnames(testDataCentered.(names{name}));
             for dir = 1:numel(directions)
-                disp(dir)
-                testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir})./calibrationCoeffs.(names{name});
+%                 disp(dir)
+                if directions(dir) == "Radius" || directions(dir) == "Found"
+                    testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir});
+                else
+                    testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir})./calibrationCoeffs.(names{name});
+                end                
             end
         end
     end

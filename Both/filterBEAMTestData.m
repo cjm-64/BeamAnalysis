@@ -1,14 +1,37 @@
-function filteredData = filterBEAMTestData(rawData, windowSize)
-    %prefiltering to remove gross noise
-    dummy = movmedian(rawData, windowSize, 1,'Endpoints', 'shrink');
-    [b, a] = butter(3, 1/35);
-    dummy = filtfilt(b, a, dummy);
+function filteredData = filterBEAMTestData(rawData, radius, found, seconds)
+    
+%     figure()
+%     subplot(4, 1, 1)
+%     plot(rawData)
+
+    
+    % Find Outliers, where rawData >45, radius not found, or eye not found
+    uf = (abs(rawData)>45 | radius==0 | ~found);
+    uf = logical(uf);
+    
+    % Replace Outliers with Median Right Eye
+    dummy = rawData;
+    dummy(uf) = NaN;
+    dummy = fillmissing(dummy, 'previous');
+%     subplot(4, 1, 2)
+%     plot(dummy)
+
+    % Filter
+    
+%     [b, a] = butter(5, 2/35);
+%     dummy = filtfilt(b, a, dummy);
+
+    dummy = lowpass(dummy, 2, 71);
+%     subplot(4, 1, 3)
+%     plot(dummy)
+    dummy = movmedian(dummy, seconds*71, 1,'Endpoints', 'shrink');
+%     subplot(4, 1, 4)
+%     plot(dummy)
+
     filteredData = dummy;
 
-    % % Identify and remove outliers
-    % dummy(isoutlier(dummy, 1)) = NaN;
-    % 
-    % % Replace NaNs with interpolated data
-    % filteredData = fillmissing(dummy,'linear', 1);
+    
+
 
 end
+

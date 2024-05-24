@@ -36,7 +36,7 @@ hold off
 
 % Conditionally Check Outlier AND >20 CALIBRATED
 % NEEDS CALIBRATION CODE
-uf = (tf | abs(dummyRaw.rightEye.X)>45 | ~dummyRaw.rightEye.Found);
+uf = (abs(dummyRaw.rightEye.X)>45 | dummyRaw.rightEye.Radius==0 | ~dummyRaw.rightEye.Found);
 uf = logical(uf);
 figure()
 plot(dummyRaw.time, dummyRaw.rightEye.X, 'r')

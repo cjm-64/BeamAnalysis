@@ -1,14 +1,18 @@
-function testDataCentered = centerData(testDataFiltered, fileName)
+function testDataCentered = centerData(testDataRaw, fileName)
    
     %% Center test data
-    names = fieldnames(testDataFiltered);
+    names = fieldnames(testDataRaw);
     for name = 1:numel(names)
         if names(name) == "time"
-            testDataCentered.time = testDataFiltered.time;
+            testDataCentered.time = testDataRaw.time;
         else
-            directions = fieldnames(testDataFiltered.(names{name}));
+            directions = fieldnames(testDataRaw.(names{name}));
             for dir = 1:numel(directions)
-                testDataCentered.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - trimmean(testDataFiltered.(names{name}).(directions{dir}), 65);
+                if directions(dir) == "Radius" || directions(dir) == "Found"
+                    testDataCentered.(names{name}).(directions{dir}) = testDataRaw.(names{name}).(directions{dir});
+                else
+                    testDataCentered.(names{name}).(directions{dir}) = testDataRaw.(names{name}).(directions{dir}) - trimmean(testDataRaw.(names{name}).(directions{dir}), 65);
+                end                
             end
         end
     end

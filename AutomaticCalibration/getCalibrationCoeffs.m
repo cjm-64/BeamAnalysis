@@ -1,4 +1,9 @@
-function calibrationCoeffs = getCalibrationCoeffs(calibrationDataFiltered, fileName)
+function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw, fileName)
+    
+    %% Filter calibration Data
+    calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
+
+    %% Calculate Coeffs
     PD = [5 10 15];
     rightCoeffs = zeros(3, 1);
     leftCoeffs = zeros(3, 1);
