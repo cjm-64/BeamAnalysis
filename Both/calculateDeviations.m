@@ -19,5 +19,5 @@ function deviations = calculateDeviations(testDataFinal, threshold, fileName)
     deviations.Found = testBool;
 
     %% Save to metrics folder
-    save(strcat('Data/Metrics/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataFinal")
+    
 end

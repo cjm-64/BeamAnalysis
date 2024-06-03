@@ -19,8 +19,4 @@ function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoe
         end
     end
 
-    
-    %% Save to filtered folder
-    save(strcat('Data/Calibrated/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataCentered")
-
 end

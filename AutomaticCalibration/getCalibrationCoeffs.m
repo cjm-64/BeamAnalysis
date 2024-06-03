@@ -26,8 +26,8 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw, fileName)
     calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
     calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
 
-    %% Save to filtered folder
-    save(strcat('Data/Coefficients/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "calibrationCoeffs")
+
+    plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
 
 end
 

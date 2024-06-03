@@ -27,5 +27,5 @@ opts = setvaropts(opts, "Header", "EmptyFieldRule", "auto");
 
 % Import the data
 importedData = readtable(filename, opts, 'ReadVariableNames',true);
-fileName = filename;
+fileName = filename(1:strfind(filename, '_17')-1);
 end

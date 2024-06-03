@@ -12,6 +12,14 @@ function testDataFinal = getFinalData(testDataCalibrated, fileName)
     testDataFinal.fps = round(length(testDataFinal.time)/(90*60));
 
 
+    %% Plot
+    figure()
+    plot(testDataFinal.time, testDataFinal.X)
+    title('Eye Alignment over time')
+    xlabel('Time (s)')
+    ylabel('Deviation (PD)')
+
+
     %% Save to processed folder
-    save(strcat('Data/Processed/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataFinal")
+    
 end

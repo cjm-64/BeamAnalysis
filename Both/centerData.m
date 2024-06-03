@@ -16,9 +16,6 @@ function testDataCentered = centerData(testDataRaw, fileName)
             end
         end
     end
-
-    %% Save to filtered folder
-    save(strcat('Data/Centered/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataCentered")
     
 end
 

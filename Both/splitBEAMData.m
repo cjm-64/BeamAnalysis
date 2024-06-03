@@ -1,4 +1,4 @@
-function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData, fileName)
+function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData)
     
     numericData = table2array(rawData(:,2:size(rawData,2)));
 
@@ -12,10 +12,6 @@ function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData, fileName)
     
     % Data Organization [RightEyeX LeftEyeX]
     testDataRaw = getTestData(numericData, headerLocs(7), headerLocs(8));
-    testDataRaw.time = getTime(headers, headerLocs(8)-(headerLocs(7)-1));
-
-    %% Save to preproccesed folder
-    save(strcat('Data/Preprocessed/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "calibrationDataRaw", "testDataRaw")
-    
+    testDataRaw.time = getTime(headers, headerLocs(8)-(headerLocs(7)-1));    
 
 end

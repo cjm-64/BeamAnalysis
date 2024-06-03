@@ -23,8 +23,5 @@ function testDataFiltered = filterBEAMData(testDataCalibrated, fileName)
             end
         end
     end
-    
-    %% Save to filtered folder
-    save(strcat('Data/Filtered/', extractBefore(fileName, strfind(fileName, '.')), '.mat'), "testDataFiltered")
 
 end
