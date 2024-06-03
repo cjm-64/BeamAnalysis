@@ -1,4 +1,4 @@
-function testDataCentered = centerData(testDataRaw, fileName)
+function testDataCentered = centerData(testDataRaw)
    
     %% Center test data
     names = fieldnames(testDataRaw);

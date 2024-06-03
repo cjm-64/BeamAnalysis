@@ -10,7 +10,7 @@ makeBEAMDataLocations()
 %% Split into calibraiton data and test data then save
 [calibrationDataRaw, testDataRaw] = splitBEAMData(importedData);
 
-%% Save to preproccesed folder
+% Save to preproccesed folder
 save(strcat('Data/Preprocessed/', fileName, '.mat'), "calibrationDataRaw", "testDataRaw")
 
 %% Get calibration coeffs and save
@@ -20,15 +20,12 @@ save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs")
 
 %% Center Data
 testDataCentered = centerData(testDataRaw, fileName);
-% plotTypeVSType_Test(testDataFiltered, testDataCentered);
 
 %% Apply Calibration
 testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName);
-% plotTypeVSType_Test(testDataCentered, testDataCalibrated);
 
 %% Filter Data
 testDataFiltered = filterBEAMData(testDataCalibrated, fileName);
-% plotTypeVSType_Test(testDataRaw, testDataFiltered);
 
 %% Save Processed Data
 save(strcat('Data/Processed/', fileName, '.mat'), "testDataCentered", "testDataCalibrated", "testDataFiltered")
