@@ -1,32 +1,20 @@
-function filteredData = filterBEAMTestData(rawData, radius, found, seconds)
-    
-%     figure()
-%     subplot(4, 1, 1)
-%     plot(rawData)
-
+function filteredData = filterBEAMTestData(rawData, radius, found, fs, seconds)
     
     % Find Outliers, where rawData >45, radius not found, or eye not found
     uf = (abs(rawData)>45 | radius==0 | ~found);
     uf = logical(uf);
     
-    % Replace Outliers with Median Right Eye
+    % Replace Outliers with previous 
     dummy = rawData;
     dummy(uf) = NaN;
     dummy = fillmissing(dummy, 'previous');
-%     subplot(4, 1, 2)
-%     plot(dummy)
-
-    % Filter
     
-%     [b, a] = butter(5, 2/35);
-%     dummy = filtfilt(b, a, dummy);
+    % Low Pass Filter, cutoff of 5 Hz
+    dummy = lowpass(dummy, 5, fs);
 
-    dummy = lowpass(dummy, 2, 71);
-%     subplot(4, 1, 3)
-%     plot(dummy)
-    dummy = movmedian(dummy, seconds*71, 1,'Endpoints', 'shrink');
-%     subplot(4, 1, 4)
-%     plot(dummy)
+    % Moving median to smooth signal, windowsize based on seconds of data
+    dummy = movmedian(dummy, seconds*fs, 1,'Endpoints', 'shrink');
+
 
     filteredData = dummy;
 

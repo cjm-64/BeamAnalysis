@@ -3,8 +3,8 @@ function testDataCentered = centerData(testDataRaw)
     %% Center test data
     names = fieldnames(testDataRaw);
     for name = 1:numel(names)
-        if names(name) == "time"
-            testDataCentered.time = testDataRaw.time;
+        if names(name) == "time" || names(name) == "fps"
+            testDataCentered.(names{name}) = testDataRaw.(names{name});
         else
             directions = fieldnames(testDataRaw.(names{name}));
             for dir = 1:numel(directions)
@@ -16,6 +16,7 @@ function testDataCentered = centerData(testDataRaw)
             end
         end
     end
+    disp("Go centered")
     
 end
 

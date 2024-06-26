@@ -1,4 +1,4 @@
-function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw, fileName)
+function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
     
     %% Filter calibration Data
     calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
@@ -23,8 +23,24 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw, fileName)
             end
         end
     end
-    calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
-    calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+
+    if mean(abs(rightCoeffs)) < 0.5 || mean(abs(rightCoeffs)) > 0.9
+        warning("Right Cal out of range: %f", mean(abs(rightCoeffs)))
+        calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+    else
+        calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+        disp("Right Cal nominal")
+    end
+
+    if mean(abs(leftCoeffs)) < 0.5 || mean(abs(leftCoeffs)) > 0.9
+        warning("Left Cal out of range: %f", mean(abs(leftCoeffs)))
+        calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+    else
+        calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+        disp("Left Cal nominal")
+    end
+
+
 
 
     plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)

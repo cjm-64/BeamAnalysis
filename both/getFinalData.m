@@ -1,25 +1,14 @@
-function testDataFinal = getFinalData(testDataCalibrated, fileName)
+function testDataFinal = getFinalData(testDataCalibrated)
    
     directions = fieldnames(testDataCalibrated.rightEye);
     for dir = 1:numel(directions)        
         if any(strcmp(directions(dir), ["Radius", "Found"]))
             continue;
         else
-            testDataFinal.(directions{dir}) = testDataCalibrated.rightEye.(directions{dir}) + testDataCalibrated.leftEye.(directions{dir});
+            testDataFinal.(directions{dir}) = abs(testDataCalibrated.rightEye.(directions{dir})) - abs(testDataCalibrated.leftEye.(directions{dir}));
         end
     end
     testDataFinal.time = testDataCalibrated.time;
-    testDataFinal.fps = round(length(testDataFinal.time)/(90*60));
-
-
-    %% Plot
-    figure()
-    plot(testDataFinal.time, testDataFinal.X)
-    title('Eye Alignment over time')
-    xlabel('Time (s)')
-    ylabel('Deviation (PD)')
-
-
-    %% Save to processed folder
+    testDataFinal.fps = round(length(testDataFinal.time)/(max(testDataCalibrated.time)));
     
 end

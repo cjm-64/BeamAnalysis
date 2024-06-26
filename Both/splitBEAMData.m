@@ -12,6 +12,8 @@ function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData)
     
     % Data Organization [RightEyeX LeftEyeX]
     testDataRaw = getTestData(numericData, headerLocs(7), headerLocs(8));
-    testDataRaw.time = getTime(headers, headerLocs(8)-(headerLocs(7)-1));    
+    testDataRaw.time = getTime(headers, headerLocs(8)-(headerLocs(7)-1));
+    testDataRaw.fps = round(length(testDataRaw.time)/(max(testDataRaw.time)));
+    disp("Go split")
 
 end

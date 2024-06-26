@@ -16,7 +16,7 @@ function plotBEAMFinalData(testDataFinal, deviations)
     title('Short recording of IXT patient with deviations')
 
     figure()
-    h = histogram(testDataFinal.X, 'BinWidth', 5, 'FaceColor', 'c')
+    h = histogram(testDataFinal.X, 'BinWidth', 2, 'FaceColor', 'c');
     xlabel('Prism Diopters')
     ylabel('Frame Count')
     title('Histogram of deviation over time')

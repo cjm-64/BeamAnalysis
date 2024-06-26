@@ -1,15 +1,12 @@
-function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName)
+function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs)
     
     names = fieldnames(testDataCentered);
     for name = 1:numel(names)
-        disp(name)
-        if names(name) == "time"
-            testDataCalibrated.time = testDataCentered.time;
-            continue;
+        if names(name) == "time" || names(name) == "fps"
+            testDataCalibrated.(names{name}) = testDataCentered.(names{name});
         else
             directions = fieldnames(testDataCentered.(names{name}));
             for dir = 1:numel(directions)
-%                 disp(dir)
                 if directions(dir) == "Radius" || directions(dir) == "Found"
                     testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir});
                 else
@@ -18,5 +15,6 @@ function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoe
             end
         end
     end
+    disp("Go calibrated")
 
 end

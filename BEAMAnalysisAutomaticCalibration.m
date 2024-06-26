@@ -4,7 +4,7 @@ clear all; close all; clc
 makeBEAMDataLocations()
 
 %% Load File
-[importedData, fileName] = importBEAMData(uigetfile('.csv'));
+[importedData, fileName] = importBEAMData(uigetfile('*.csv'));
 
 % tic
 %% Split into calibraiton data and test data then save
@@ -14,31 +14,37 @@ makeBEAMDataLocations()
 save(strcat('Data/Preprocessed/', fileName, '.mat'), "calibrationDataRaw", "testDataRaw")
 
 %% Get calibration coeffs and save
-calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw, fileName);
+calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw);
 
 save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs")
 
 %% Center Data
-testDataCentered = centerData(testDataRaw, fileName);
+testDataCentered = centerData(testDataRaw);
 
 %% Apply Calibration
-testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs, fileName);
+testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
 
 %% Filter Data
-testDataFiltered = filterBEAMData(testDataCalibrated, fileName);
+testDataFiltered = filterBEAMData(testDataCalibrated);
 
 %% Save Processed Data
 save(strcat('Data/Processed/', fileName, '.mat'), "testDataCentered", "testDataCalibrated", "testDataFiltered")
 
 
 %% Subtract Left from Right
-testDataFinal = getFinalData(testDataFiltered, fileName);
+testDataFinal = getFinalData(testDataFiltered);
 
 save(strcat('Data/Processed/', fileName, '.mat'), "testDataFinal")
 
 %% Locate Deviations
 threshold = 15;
-deviations = calculateDeviations(testDataFinal, threshold, fileName);
+deviations = calculateDeviations(testDataFinal, threshold);
+if ~isnan(deviations.X.startAndEnds) 
+    sum(deviations.X.lengths(:,2))
+    max(deviations.X.magnitude(:,1))
+else
+    disp ("No Deviations")
+end
 
 save(strcat('Data/Metrics/', fileName, '.mat'), "threshold", "deviations")
 
