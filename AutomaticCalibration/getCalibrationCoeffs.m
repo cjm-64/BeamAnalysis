@@ -26,7 +26,7 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
 
     if mean(abs(rightCoeffs)) < 0.5 || mean(abs(rightCoeffs)) > 0.9
         warning("Right Cal out of range: %f", mean(abs(rightCoeffs)))
-        calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+        calibrationCoeffs.rightEye = 0.7;
     else
         calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
         disp("Right Cal nominal")
@@ -34,7 +34,7 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
 
     if mean(abs(leftCoeffs)) < 0.5 || mean(abs(leftCoeffs)) > 0.9
         warning("Left Cal out of range: %f", mean(abs(leftCoeffs)))
-        calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+        calibrationCoeffs.leftEye = 0.7;
     else
         calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
         disp("Left Cal nominal")

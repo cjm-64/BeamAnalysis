@@ -9,7 +9,6 @@ function filteredData = filterBEAMTestData(rawData, radius, found, fs, seconds)
     dummy(uf) = NaN;
     if uf(1) == 1
         dummy(1) = median(dummy, 'omitnan');
-        dummy(1)
     end
     dummy = fillmissing(dummy, 'previous');
     

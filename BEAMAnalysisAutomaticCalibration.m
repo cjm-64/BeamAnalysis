@@ -41,7 +41,7 @@ threshold = 15;
 deviations = calculateDeviations(testDataFinal, threshold);
 if ~isnan(deviations.X.startAndEnds) 
     sum(deviations.X.lengths(:,2))
-    max(deviations.X.magnitude(:,1))
+    mean(deviations.X.magnitude(:,1))
 else
     disp ("No Deviations")
 end
