@@ -16,7 +16,7 @@ function deviations = getDeviations(data, threshold, fps)
                     isDeviated = false;
                     if (deviations(2, deviationCount-1) - deviations(1, deviationCount-1) < frames2sec)
                         deviationCount = deviationCount - 1;
-                         deviations(:, deviationCount) = NaN;
+                        deviations(:, deviationCount) = NaN;
                     end
                 end
             % First instance of deviation (start)
@@ -33,5 +33,8 @@ function deviations = getDeviations(data, threshold, fps)
                 end
             end
         end
+    end
+    if size(deviations, 2) > 1 && isnan(deviations(1, size(deviations, 2)))
+        deviations = deviations(:, 1:size(deviations, 2)-1);
     end
 end

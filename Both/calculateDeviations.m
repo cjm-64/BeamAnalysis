@@ -7,7 +7,7 @@ function deviations = calculateDeviations(testDataFinal, threshold)
             continue;
         else
             deviations.(directions{dir}).startAndEnds = getDeviations(testDataFinal.(directions{dir}), threshold, testDataFinal.fps)';
-            if ~isnan(deviations.(directions{dir}).startAndEnds)                
+            if ~isnan(deviations.(directions{dir}).startAndEnds(1,1))                
                 deviations.(directions{dir}).lengths = getDeviationLengths(deviations.(directions{dir}).startAndEnds, testDataFinal.fps);
                 deviations.(directions{dir}).magnitude = getDeviationMagnitudes(testDataFinal.(directions{dir}), deviations.(directions{dir}).startAndEnds);
             else

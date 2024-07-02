@@ -3,9 +3,11 @@ clear all; close all; clc
 %% Load files
 path = "Data/Coefficients";
 files = dir(path);
-rightcoeffs = zeros(11, 1);
-leftcoeffs = zeros(11, 1);
-names = strings(11, 1);
+
+numFiles = sum(contains({files.name}, "BEAM"));
+rightcoeffs = zeros(numFiles, 1);
+leftcoeffs = zeros(numFiles, 1);
+names = strings(numFiles, 1);
 rowNum = 1;
 for i = 1:size(files, 1)
     if contains(files(i).name, "BEAM")
@@ -24,3 +26,6 @@ sprintf('Right Max: %f      Right Min: %f', mean(output.rightcoeffs)+2*std(outpu
 sprintf('Left: %f ± %f', mean(output.leftcoeffs),  std(output.leftcoeffs))
 sprintf('Left Max: %f      Right Left: %f', mean(output.leftcoeffs)+2*std(output.leftcoeffs),  mean(output.leftcoeffs)-2*std(output.leftcoeffs))
 
+%% 
+
+writetable(output, 'calibrationCoeffs.xls')

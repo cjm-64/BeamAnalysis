@@ -10,7 +10,7 @@ function plotBEAMFinalData(testDataFinal, deviations)
         plot(minutes(deviations.X.magnitude(:,2)), deviations.X.magnitude(:,1),'k*')
         legend('Deviation Amount','Threshold','Deviation Onset', 'Deviation End', 'Max deviation', 'Location','northwest')
     end
-    ylim([-45 45])
+    ylim([0 45])
     xlabel('time (min)')
     ylabel('prism diopters')
     title('Short recording of IXT patient with deviations')
