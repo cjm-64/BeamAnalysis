@@ -1,4 +1,4 @@
-function plotBEAMFinalData(testDataFinal, deviations)
+function plotBEAMFinalData(testDataFinal, deviations, fileName)
     minutes  = linspace(0, max(testDataFinal.time)/60, size(testDataFinal.time, 1));
     figure()
     plot(minutes, testDataFinal.X,'b')
@@ -13,7 +13,7 @@ function plotBEAMFinalData(testDataFinal, deviations)
     ylim([0 45])
     xlabel('time (min)')
     ylabel('prism diopters')
-    title('Short recording of IXT patient with deviations')
+    title(fileName, 'Interpreter','none')
 
     figure()
     h = histogram(testDataFinal.X, 'BinWidth', 2, 'FaceColor', 'c');

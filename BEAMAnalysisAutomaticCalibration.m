@@ -46,7 +46,7 @@ if ~isnan(deviations.X.startAndEnds(1,1))
 else
     deviations.percentage = 0;
     deviations.meanSize = 0;
-    deviations.medianSize = m0;
+    deviations.medianSize = 0;
     disp ("No Deviations")
 end
 
@@ -57,7 +57,7 @@ save(strcat('Data/Metrics/', fileName, '.mat'), "threshold", "deviations")
 plotBEAMProcessingSteps(testDataRaw, testDataFiltered, testDataCentered, testDataCalibrated)
 
 %% Plot data with deviations
-plotBEAMFinalData(testDataFinal, deviations)
+plotBEAMFinalData(testDataFinal, deviations, fileName)
 
 %% Do Z score for histogram
 
