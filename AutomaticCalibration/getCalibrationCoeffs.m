@@ -46,8 +46,8 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
         disp("Left Cal nominal")
     end
 
-    calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
-    calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+%     calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+%     calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
 
 
 

@@ -5,7 +5,7 @@ function testDataFinal = getFinalData(testDataCalibrated)
         if any(strcmp(directions(dir), ["Radius", "Found"]))
             continue;
         else
-            testDataFinal.(directions{dir}) = abs(abs(testDataCalibrated.rightEye.(directions{dir})) - abs(testDataCalibrated.leftEye.(directions{dir})));
+            testDataFinal.(directions{dir}) = abs(testDataCalibrated.rightEye.(directions{dir})) - abs(testDataCalibrated.leftEye.(directions{dir}));
         end
     end
     testDataFinal.time = testDataCalibrated.time;
