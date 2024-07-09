@@ -17,7 +17,5 @@ function deviations = calculateDeviations(testDataFinal, threshold)
     end
     deviations.threshold = threshold;
     deviations.Found = testBool;
-
-    %% Save to metrics folder
     
 end

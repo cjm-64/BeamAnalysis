@@ -8,7 +8,7 @@ function plotBEAMFinalData(testDataFinal, deviations, fileName)
     if deviations.Found
         plot(minutes(deviations.X.startAndEnds(:,1)), testDataFinal.X(deviations.X.startAndEnds(:,1)), 'g*')
         plot(minutes(deviations.X.startAndEnds(:,2)), testDataFinal.X(deviations.X.startAndEnds(:,2)), 'm*')
-        plot(minutes(deviations.X.magnitude(:,2)), deviations.X.magnitude(:,1),'k*')
+        plot(minutes(deviations.X.magnitude(:,2)), testDataFinal.X(deviations.X.magnitude(:,2)),'k*')
         legend('Deviation Amount','Threshold','Deviation Onset', 'Deviation End', 'Max deviation', 'Location','northwest')
     end
     ylim([-45 45])

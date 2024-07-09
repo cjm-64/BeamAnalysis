@@ -14,6 +14,11 @@ function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData)
     testDataRaw = getTestData(numericData, headerLocs(7), headerLocs(8));
     testDataRaw.time = getTime(headers, headerLocs(8)-(headerLocs(7)-1));
     testDataRaw.fps = round(length(testDataRaw.time)/(max(testDataRaw.time)));
+
+    %% Remove first and last 2 minutes
+    testDataRaw = clipRawData(testDataRaw);
+    
+    %%
     disp("Go split")
 
 end

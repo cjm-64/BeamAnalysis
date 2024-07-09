@@ -34,6 +34,7 @@ save(strcat('Data/Processed/', fileName, '.mat'), "testDataCentered", "testDataC
 %% Subtract Left from Right
 testDataFinal = getFinalData(testDataFiltered);
 
+%%
 save(strcat('Data/Processed/', fileName, '.mat'), "testDataFinal")
 
 %% Locate Deviations

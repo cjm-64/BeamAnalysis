@@ -11,7 +11,8 @@ function testDataCentered = centerData(testDataRaw)
                 if directions(dir) == "Radius" || directions(dir) == "Found"
                     testDataCentered.(names{name}).(directions{dir}) = testDataRaw.(names{name}).(directions{dir});
                 else
-                    testDataCentered.(names{name}).(directions{dir}) = testDataRaw.(names{name}).(directions{dir}) - trimmean(testDataRaw.(names{name}).(directions{dir}), 65);
+%                     testDataCentered.(names{name}).(directions{dir}) = testDataRaw.(names{name}).(directions{dir}) - trimmean(testDataRaw.(names{name}).(directions{dir}), 65);
+                    testDataCentered.(names{name}).(directions{dir}) = testDataRaw.(names{name}).(directions{dir}) - median(testDataRaw.(names{name}).(directions{dir}));
                 end                
             end
         end
