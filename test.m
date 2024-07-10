@@ -120,6 +120,41 @@ plot(testDataRaw.leftEye.X - median(testDataRaw.leftEye.X(124*30)), 'b')
 legend('Right', 'Left')
 
 
+%% 
+
+x = testDataFiltered.time;
+yRight = testDataFiltered.rightEye.X;
+yLeft = testDataFiltered.leftEye.X;
+
+b1Right = x\yRight;
+yCalcRight1 = b1Right*x;
+
+b1left = x\yLeft;
+yCalcLeft1 = b1left*x;
+
+newYRight = yRight - yCalcRight1;
+newYleft = yLeft - yCalcLeft1;
+
+figure()
+subplot(2,2,1)
+plot(x,yRight, 'r')
+hold on
+plot(x, yCalcRight1, 'b')
+plot(x, newYRight, 'g')
+
+subplot(2,2,2)
+plot(x,yLeft, 'r')
+hold on
+plot(x, yCalcLeft1, 'b')
+plot(x, newYleft, 'g')
+
+subplot(2,2,3:4)
+plot(x, yRight - yLeft, 'b')
+hold on
+plot(x,newYRight-newYleft, 'r')
+yline(10, 'k')
+yline(-10, 'k')
+ylim([-15 15])
 
 
 
