@@ -62,9 +62,9 @@ end
 %%
 figure()
 subplot(2,1,1)
-plot(testDataFiltered.time, testDataFiltered.rightEye.X, 'r')
+plot(TDFil.time, TDFil.rightEye.X, 'r')
 hold on
-plot(testDataFiltered.time, testDataFiltered.leftEye.X, 'b')
+plot(TDFil.time, TDFil.leftEye.X, 'b')
 yline(10, 'g')
 yline(-10, 'g')
 yline(0, 'c')
@@ -74,8 +74,8 @@ legend("Right Eye", "Left Eye")
 subplot(2,1,2)
 plot(testDataFinal.X, 'k')
 hold on
-plot(testDataFiltered.rightEye.X, 'r')
-plot(testDataFiltered.leftEye.X, 'b')
+plot(TDFil.rightEye.X, 'r')
+plot(TDFil.leftEye.X, 'b')
 yline(10, 'g')
 yline(-10, 'g')
 yline(0, 'c')
@@ -84,7 +84,7 @@ yline(0, 'c')
 
 %% 
 
-filterDummy = testDataCalibrated.rightEye.X;
+filterDummy = TDCal.rightEye.X;
 uf = (abs([0; diff(filterDummy)])>50);
 plot(filterDummy, 'r')
 hold on
@@ -122,9 +122,9 @@ legend('Right', 'Left')
 
 %% 
 
-x = testDataFiltered.time;
-yRight = testDataFiltered.rightEye.X;
-yLeft = testDataFiltered.leftEye.X;
+x = TDFil.time;
+yRight = TDFil.rightEye.X;
+yLeft = TDFil.leftEye.X;
 
 b1Right = x\yRight;
 yCalcRight1 = b1Right*x;
@@ -141,12 +141,14 @@ plot(x,yRight, 'r')
 hold on
 plot(x, yCalcRight1, 'b')
 plot(x, newYRight, 'g')
+title('Right')
 
 subplot(2,2,2)
 plot(x,yLeft, 'r')
 hold on
 plot(x, yCalcLeft1, 'b')
 plot(x, newYleft, 'g')
+title('Left')
 
 subplot(2,2,3:4)
 plot(x, yRight - yLeft, 'b')
@@ -155,12 +157,75 @@ plot(x,newYRight-newYleft, 'r')
 yline(10, 'k')
 yline(-10, 'k')
 ylim([-15 15])
+title('Total')
+
+%%
+
+TDCen = centerData(testDataRaw);
+TDCal = calibrateBEAMData(TDCen, calibrationCoeffs);
+TDFil = filterBEAMData(TDCal);
+TDReCen.rightEye.X = TDFil.rightEye.X - median(TDFil.rightEye.X(1:TDFil.fps*10));
+TDReCen.leftEye.X = TDFil.leftEye.X - median(TDFil.leftEye.X(1:TDFil.fps*10));
+
+figure()
+subplot(2,1,1)
+plot(TDReCen.rightEye.X, 'r')
+hold on
+plot(TDReCen.leftEye.X, 'b')
+legend('Right Eye', 'Left Eye')
+
+subplot(2,1,2)
+plot(abs(TDReCen.rightEye.X) - abs(TDReCen.leftEye.X))
+close 1
 
 
+data = [TDFil.rightEye.X, TDFil.leftEye.X];
+fig1 = figure();
+line1 = plot(data(:,1));
+line2 = yline(0,'k');
+startXLine = xline(1, 'g');
+endXLine = xline(size(data(:,1), 1), 'm');
+locations = zeros(2,2);
+for i = 1:size(data,2)
+    lineLocation = 1;
+    startAndEndLocations = [1 size(data(:,1), 1)];
+    button = 0;
+    
+    set(line1, 'YData', data(:,i))
+    while button <= 2
+        drawnow
+        [x, y, button] = ginput(1);
+        [breakflag, lineLocation, startAndEndLocations] = CoG_buttonPressed(x, button, lineLocation, startAndEndLocations, startXLine, endXLine);
+        breakflag
+        button
+        if breakflag == true
+            breakflag = false;
+            break;
+        end
+    end
+    set(startXLine, 'Value', 1)
+    set(endXLine, 'Value', size(data(:,1), 1))
+    locations(:,i) = startAndEndLocations;
+end
+close 1
 
+TDReCen.rightEye.X = TDFil.rightEye.X - median(TDFil.rightEye.X(locations(1,1):locations(2,1)));
+TDReCen.leftEye.X = TDFil.leftEye.X - median(TDFil.leftEye.X(locations(1,2):locations(2,2)));
+TDReCen.fps = TDFil.fps;
 
+figure()
+subplot(2,1,1)
+plot(TDReCen.rightEye.X, 'r')
+hold on
+plot(TDReCen.leftEye.X, 'b')
+legend('Right Eye', 'Left Eye')
 
-
+subplot(2,1,2)
+plot(TDReCen.rightEye.X - TDReCen.leftEye.X)
+hold on
+yline(10, 'k')
+yline(0, 'k')
+yline(-10, 'k')
 
 
 

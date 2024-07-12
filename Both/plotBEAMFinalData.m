@@ -4,7 +4,8 @@ function plotBEAMFinalData(testDataFinal, deviations, fileName)
     plot(minutes, testDataFinal.X,'b')
     hold on
     yline(deviations.threshold, 'r--')
-    yline(-1*deviations.threshold, 'r--')    
+    yline(-1*deviations.threshold, 'r--')   
+    yline(0, 'k')     
     if deviations.Found
         plot(minutes(deviations.X.startAndEnds(:,1)), testDataFinal.X(deviations.X.startAndEnds(:,1)), 'g*')
         plot(minutes(deviations.X.startAndEnds(:,2)), testDataFinal.X(deviations.X.startAndEnds(:,2)), 'm*')
