@@ -209,7 +209,7 @@ for i = 1:size(data,2)
 end
 close 1
 
-TDReCen.rightEye.X = TDFil.rightEye.X - median(TDFil.rightEye.X(locations(1,1):locations(2,1)));
+TDReCen.rightEye.X = TDFil.rightEye.X - median(TDFil.rightEye.X(locations(1,1):locations(2,1), 1));
 TDReCen.leftEye.X = TDFil.leftEye.X - median(TDFil.leftEye.X(locations(1,2):locations(2,2)));
 TDReCen.fps = TDFil.fps;
 
