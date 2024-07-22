@@ -25,7 +25,7 @@ function deviations = getDeviations(data, threshold, fps)
                 % Start/End case where only 1 frame is deviated
                 if i == size(data, 1) || ~(data(i+1) > threshold)                    
                     deviations(1, deviationCount) = i;
-                    deviations(2, deviationCount) = i;
+                    deviations(2, deviationCount) = i+1;
                     deviationCount = deviationCount + 1;
                 % Start case
                 else

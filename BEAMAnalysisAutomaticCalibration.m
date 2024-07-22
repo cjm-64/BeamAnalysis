@@ -14,9 +14,10 @@ makeBEAMDataLocations()
 save(strcat('Data/Preprocessed/', fileName, '.mat'), "calibrationDataRaw", "testDataRaw")
 
 %% Get calibration coeffs and save
-calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw);
+offsets = zeros(4,6);
+[calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw, offsets, 1);
 
-save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs")
+save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs", "offsets")
 
 %% Center Data
 testDataCentered = centerData(testDataRaw);

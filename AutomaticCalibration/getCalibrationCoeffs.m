@@ -1,4 +1,4 @@
-function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
+function [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw,offsets, fileNum)
     
     %% Filter calibration Data
     calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
@@ -24,33 +24,41 @@ function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
         end
     end
 
-    if mean(abs(rightCoeffs)) < 0.5
-        warning("Right Cal out of range: %f", mean(abs(rightCoeffs)))
-        calibrationCoeffs.rightEye = 0.5;
-    elseif  mean(abs(rightCoeffs)) > 0.9
-        warning("Right Cal out of range: %f", mean(abs(rightCoeffs)))
-        calibrationCoeffs.rightEye = 0.9;
+    if mean(abs(rightCoeffs)) < 0.5 || mean(abs(rightCoeffs)) > 0.9
+        warning('Right eye out of bounds')
+        if mean(abs(leftCoeffs)) > 0.5 && mean(abs(leftCoeffs)) < 0.9
+            calibrationCoeffs.rightEye = mean(abs(leftCoeffs));
+        else
+            if mean(abs(rightCoeffs)) < 0.5
+                calibrationCoeffs.rightEye = 0.5;
+            else
+                calibrationCoeffs.rightEye = 0.9;
+            end
+        end
     else
         calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
-        disp("Right Cal nominal")
     end
 
-    if mean(abs(leftCoeffs)) < 0.5
-        warning("Left Cal out of range: %f", mean(abs(leftCoeffs)))
-        calibrationCoeffs.leftEye = 0.5;
-    elseif mean(abs(leftCoeffs)) > 0.9
-        warning("Left Cal out of range: %f", mean(abs(leftCoeffs)))
-        calibrationCoeffs.leftEye = 0.9;
+    if mean(abs(leftCoeffs)) < 0.5 || mean(abs(leftCoeffs)) > 0.9
+        warning('Left eye out of bounds')
+        if mean(abs(rightCoeffs)) > 0.5 && mean(abs(rightCoeffs)) < 0.9
+            calibrationCoeffs.leftEye = mean(abs(rightCoeffs));
+        else
+            if mean(abs(rightCoeffs)) < 0.5
+                calibrationCoeffs.leftEye = 0.5;
+            else
+                calibrationCoeffs.leftEye = 0.9;
+            end
+        end
     else
         calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
-        disp("Left Cal nominal")
     end
 
 %     calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
 %     calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
 
 
-
+    offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered, offsets, fileNum);
 
     plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
 

@@ -137,7 +137,7 @@ newYleft = yLeft - yCalcLeft1;
 
 figure()
 subplot(2,2,1)
-plot(x,yRight, 'r')
+plot(x, yRight, 'r')
 hold on
 plot(x, yCalcRight1, 'b')
 plot(x, newYRight, 'g')
@@ -158,6 +158,7 @@ yline(10, 'k')
 yline(-10, 'k')
 ylim([-15 15])
 title('Total')
+legend('Original', 'Detrended')
 
 %%
 

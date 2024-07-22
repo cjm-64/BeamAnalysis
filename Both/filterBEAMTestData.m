@@ -7,7 +7,9 @@ function filteredData = filterBEAMTestData(rawData, radius, found, fs, seconds)
     % Replace Outliers with previous 
     dummy = rawData;
     dummy(uf) = NaN;
-    if uf(1) == 1
+    if isempty(uf)
+        % Do nothing
+    elseif uf(1) == 1
         dummy(1) = median(dummy, 'omitnan');
     end
     dummy = fillmissing(dummy, 'previous');

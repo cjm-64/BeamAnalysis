@@ -1,14 +1,14 @@
-function testDataFinal = getFinalData(testDataCalibrated)
+function testDataFinal = getFinalData(testDataFiltered)
    
-    directions = fieldnames(testDataCalibrated.rightEye);
+    directions = fieldnames(testDataFiltered.rightEye);
     for dir = 1:numel(directions)        
         if any(strcmp(directions(dir), ["Radius", "Found"]))
             continue;
         else
-            testDataFinal.(directions{dir}) = abs(testDataCalibrated.rightEye.(directions{dir})) - abs(testDataCalibrated.leftEye.(directions{dir}));
+            testDataFinal.(directions{dir}) = abs(testDataFiltered.rightEye.(directions{dir})) - abs(testDataFiltered.leftEye.(directions{dir}));
         end
     end
-    testDataFinal.time = testDataCalibrated.time;
-    testDataFinal.fps = round(length(testDataFinal.time)/(max(testDataCalibrated.time)));
+    testDataFinal.time = testDataFiltered.time;
+    testDataFinal.fps = round(length(testDataFinal.time)/(max(testDataFiltered.time)));
     
 end
