@@ -233,10 +233,6 @@ yline(-10, 'k')
 calSide = fieldnames(calibrationDataRaw);
 locations = zeros(12,2);
 loc = 1;
-
-fig1 = figure();
-line1 = calibrationDataRaw.rightCal.fivePD.rightEye;
-line2 = yline(0,'k');
 for CS = 1:numel(calSide)
     calAmount = fieldnames(calibrationDataRaw.(calSide{CS}));
     for CA = 1:numel(calAmount)
@@ -248,10 +244,10 @@ for CS = 1:numel(calSide)
                     countinue
                 else
                     lineLocation = 1;
-                    startAndEndLocations = [1 size(calibrationDataRaw.(calSide{CS}).(calAmount{CA}).(calEye{CE}).(calDirection{CD}))];
+                    startAndEndLocations = [1 size(calibrationDataRaw.(calSide{CS}).(calAmount{CA}).(calEye{CE}).(calDirection(CD)))];
                     button = 0;
                     
-                    set(line1, 'YData', calibrationDataRaw.(calSide{CS}).(calAmount{CA}).(calEye{CE}).(calDirection{CD}))
+                    set(line1, 'YData', data(:,i))
                     while button <= 2
                         drawnow
                         [x, y, button] = ginput(1);
