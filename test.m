@@ -235,8 +235,10 @@ locations = zeros(12,2);
 loc = 1;
 
 fig1 = figure();
-line1 = calibrationDataRaw.rightCal.fivePD.rightEye;
+line1 = plot(calibrationDataRaw.rightCal.fivePD.rightEye.X);
 line2 = yline(0,'k');
+startXLine = xline(1, 'g');
+endXLine = xline(calibrationDataRaw.rightCal.fivePD.rightEye.X);
 for CS = 1:numel(calSide)
     calAmount = fieldnames(calibrationDataRaw.(calSide{CS}));
     for CA = 1:numel(calAmount)
@@ -276,8 +278,6 @@ end
 % fig1 = figure();
 % line1 = plot(data(:,1));
 % line2 = yline(0,'k');
-% startXLine = xline(1, 'g');
-% endXLine = xline(size(data(:,1), 1), 'm');
 % locations = zeros(2,2);
 % for i = 1:size(data,2)
 %     lineLocation = 1;
