@@ -54,8 +54,8 @@ function [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw,
         calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
     end
 
-%     calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
-%     calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+    calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+    calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
 
 
     offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered, offsets, fileNum);
