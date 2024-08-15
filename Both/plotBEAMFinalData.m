@@ -20,7 +20,7 @@ function plotBEAMFinalData(testDataFinal, deviations, fileName)
     title(fileName, 'Interpreter','none')
 
     figure()
-    h = histogram(abs(testDataFinal.X), 'BinWidth', 2, 'FaceColor', 'c');
+    h = histogram(testDataFinal.X, 'BinWidth', 2, 'FaceColor', 'c');
     xlabel('Prism Diopters')
     ylabel('Frame Count')
     title('Histogram of deviation over time')
