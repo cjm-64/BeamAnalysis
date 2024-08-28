@@ -29,6 +29,7 @@ testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
 testDataFiltered = filterBEAMData(testDataCalibrated);
 
 %% Check Calibration and Detrend Data
+close all
 [testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
 testDataDetrended = detrendBEAMData(testDataFiltered);
 

@@ -1,5 +1,6 @@
 function [testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
-    figure(1)
+    figure("Position",[1722 42 1718 1314])
+    
     while ishandle(1)
         calibrationCoeffs
     
