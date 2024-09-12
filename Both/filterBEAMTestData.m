@@ -15,7 +15,7 @@ function filteredData = filterBEAMTestData(rawData, radius, found, fs, seconds)
     dummy = fillmissing(dummy, 'previous');
     
     % Low Pass Filter, cutoff of 5 Hz
-    [b, a] = butter(3, 5/ceil(fs/2), "low");
+    [b, a] = butter(4, 5/ceil(fs/2), "low");
     dummy = filtfilt(b, a, dummy);
 
     % Moving median to smooth signal, windowsize based on seconds of data
