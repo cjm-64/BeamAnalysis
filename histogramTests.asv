@@ -84,7 +84,7 @@ ylim([0 4*10^5])
 title('Control 1')
 xlabel('Deviation (PD)')
 ylabel('Count')
-saveas(gcf, 'HistogramControl1.png')
+saveas(gcf, 'Control1Histogram.png')
 
 figure()
 histogram(p1, 'BinWidth', 2, 'FaceAlpha', 0.5, 'FaceColor', map(1,:))
@@ -93,70 +93,59 @@ ylim([0 4*10^5])
 title('Patient 1')
 xlabel('Deviation (PD)')
 ylabel('Count')
-saveas(gcf, 'HistogramPatient1.png')
+saveas(gcf, 'Control1.png')
 
 figure()
 histogram(c2, 'BinWidth', 2, 'FaceAlpha', 0.5, 'FaceColor', map(2,:))
 xlim([-45 45])
 ylim([0 4*10^5])
-title('Control 2')
-xlabel('Deviation (PD)')
-ylabel('Count')
-saveas(gcf, 'HistogramControl2.png')
 
 figure()
 histogram(p2, 'BinWidth', 2, 'FaceAlpha', 0.5, 'FaceColor',  map(1,:))
 xlim([-45 45])
 ylim([0 4*10^5])
-title('Patient 2')
-xlabel('Deviation (PD)')
-ylabel('Count')
-saveas(gcf, 'HistogramPatient2.png')
 
 %%
 figure()
-h1 = histfit(c1, ceil(length(unique(round(c1)))/2));
+subplot(2, 2, 1);
+h1 = histfit(c1, length(unique(round(c1))));
 set(h1(1), 'facecolor', 'b');
 set(h1(2), 'color', 'k');
 xlim([-45 45])
-ylim([0 4*10^5])
+ylim([0 2.5*10^5])
 title('Control 1')
 ylabel('Count')
 xlabel('Deviation (PD)')
-saveas(gcf, 'FittedHistogramControl1.png')
 
-figure()
-h2 = histfit(p1, ceil(length(unique(round(p1)))/2));
+subplot(2, 2, 2);
+h2 = histfit(p1, length(unique(round(p1))));
 set(h2(1), 'facecolor', 'r');
 set(h2(2), 'color', 'k');
 xlim([-45 45])
-ylim([0 4*10^5])
+ylim([0 2.5*10^5])
 title('Patient 1')
 ylabel('Count')
 xlabel('Deviation (PD)')
-saveas(gcf, 'FittedHistogramPatient1.png')
 
-figure()
-h3 = histfit(c2, ceil(length(unique(round(c2)))/2));
+subplot(2, 2, 3);
+h3 = histfit(c2, length(unique(round(c2))));
 set(h3(1), 'facecolor', 'b');
 set(h3(2), 'color', 'k');
 xlim([-45 45])
-ylim([0 4*10^5])
+ylim([0 2.5*10^5])
 title('Control 2')
 ylabel('Count')
 xlabel('Deviation (PD)')
-saveas(gcf, 'FittedHistogramControl2.png')
 
-figure()
-h4 = histfit(p2, ceil(length(unique(round(p2)))/2));
+subplot(2, 2, 4);
+h4 = histfit(p2, length(unique(round(p2))));
 set(h4(1), 'facecolor', 'r');
 set(h4(2), 'color', 'k');
 xlim([-45 45])
-ylim([0 4*10^5])
+ylim([0 2.5*10^5])
 title('Patient 2')
 ylabel('Count')
 xlabel('Deviation (PD)')
-saveas(gcf, 'FittedHistogramPatient2.png')
 
 %%
 fitdist(c1,  'Normal')
