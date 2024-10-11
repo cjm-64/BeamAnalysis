@@ -168,12 +168,27 @@ fitdist(p2,  'Normal')
 %% Group  every second
 
 inRange = 1;
-windowStartLocation = 1;
+windowStartLoc = 1;
 c1Grouped = zeros(ceil(size(c1, 1)/120), 1);
+loc = 1;
 while inRange == 1
-    
+    windowEndLoc = windowStartLoc + 119;
+    if windowEndLoc < size(c1, 1)
+        % Window end in range, group full window
+        c1Grouped(loc) = median(c1(windowStartLoc:windowStartLoc+120));
+        windowStartLoc = windowEndLoc;
+        loc = loc + 1;
+    else
+        % Window end out of range, group up to end
+        c1Grouped(loc) = median(c1(windowStartLoc:size(c1, 1)));
+        inRange = 0;
+    end
 end
 
+figure()
+histogram(c1, 'BinWidth', 2, 'FaceAlpha', 0.5, 'FaceColor', map(2,:))
 
+figure()
+histogram(c1Grouped, 'BinWidth', 2, 'FaceAlpha', 0.5, 'FaceColor', map(2,:))
 
 
