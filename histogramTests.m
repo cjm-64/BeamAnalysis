@@ -1,11 +1,11 @@
 
-load('C:\Users\Chris\Documents\GitHub\BeamAnalysis\Data\Final\BEAM_NJIT003_OUT.mat')
+load('Data\Final\BEAM_NJIT003_OUT.mat')
 c1 = testDataFinal.X;
-load('C:\Users\Chris\Documents\GitHub\BeamAnalysis\Data\Final\BEAM_NJIT005_OUT.mat')
+load('Data\Final\BEAM_NJIT005_OUT.mat')
 c2 = testDataFinal.X;
-load('C:\Users\Chris\Documents\GitHub\BeamAnalysis\Data\Final\BEAM_SALUS003_BASE.mat')
+load('Data\Final\BEAM_SALUS003_BASE.mat')
 p1 = testDataFinal.X;
-load('C:\Users\Chris\Documents\GitHub\BeamAnalysis\Data\Final\BEAM_SALUS002_BASE.mat')
+load('Data\Final\BEAM_SALUS002_BASE.mat')
 p2 = testDataFinal.X;
 clearvars -except c1 c2 p1 p2
 
@@ -165,9 +165,14 @@ fitdist(p1,  'Normal')
 fitdist(p2,  'Normal')
 
 
+%% Group  every second
 
-
-
+inRange = 1;
+windowStartLocation = 1;
+c1Grouped = zeros(ceil(size(c1, 1)/120), 1);
+while inRange == 1
+    
+end
 
 
 
