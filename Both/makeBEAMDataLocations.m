@@ -1,5 +1,5 @@
 function makeBEAMDataLocations()
-    folders = ["Preprocessed", "Coefficients", "Processed", "Metrics", "Final"];
+    folders = ["Preprocessed", "Coefficients", "Processed", "Subracted", "Metrics", "Final"];
 
     for folder = 1:numel(folders)
         folderName = append("Data/", folders(folder));

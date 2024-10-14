@@ -1,9 +1,10 @@
 function [calibrationDataRaw, testDataRaw] = splitBEAMData(rawData)
     
-    numericData = table2array(rawData(:,2:size(rawData,2)));
-
+%     numericData = table2array(rawData(:,2:size(rawData,2)));
+    numericData = rawData.data;
+    headerCol = rawData.textdata(:,1);
     %% Find where to split
-    [headers, headerLocs] = getHeaders(rawData.Header);
+    [headers, headerLocs] = getHeaders(rawData.textdata(:,1));
     headerLocs(length(headerLocs) + 1) = size(numericData, 1);
 
     %% Split into calibraiton data and test data

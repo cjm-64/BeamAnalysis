@@ -168,27 +168,61 @@ fitdist(p2,  'Normal')
 
 %% Group  every second
 groupedData = {};
+fps = 120;
+numSecs = 5;
+groupByFPS = fps * numSecs;
 for dataSetNum = 1:size(allData,2)
     dataSet = allData{dataSetNum};
     inRange = 1;
     windowStartLoc = 1;
-    groupedPlaceholder = zeros(ceil(size(dataSet, 1)/120), 1);
+    groupedPlaceholder = zeros(ceil(size(dataSet, 1)/groupByFPS), 1);
     loc = 1;
     while inRange == 1
-        windowEndLoc = windowStartLoc + 119;
+        windowEndLoc = windowStartLoc + groupByFPS-1;
         if windowEndLoc < size(dataSet, 1)
             % Window end in range, group full window
-            groupedPlaceholder(loc) = median(dataSet(windowStartLoc:windowStartLoc+120));
+            groupedPlaceholder(loc) = mean(dataSet(windowStartLoc:windowStartLoc+groupByFPS));
             windowStartLoc = windowEndLoc;
             loc = loc + 1;
         else
             % Window end out of range, group up to end
-            groupedPlaceholder(loc) = median(dataSet(windowStartLoc:size(dataSet, 1)));
+            groupedPlaceholder(loc) = mean(dataSet(windowStartLoc:size(dataSet, 1)));
             inRange = 0;
         end
     end
     groupedData(dataSetNum) = {groupedPlaceholder};
 end
+
+figure()
+subplot(2, 2, 1)
+plot(groupedData{1})
+yline(10)
+yline(-10)
+yline(0)
+ylim([-50 50])
+title('C1')
+subplot(2, 2, 2)
+plot(groupedData{3})
+yline(10)
+yline(-10)
+yline(0)
+ylim([-50 50])
+title('P1')
+subplot(2, 2, 3)
+plot(groupedData{2})
+yline(10)
+yline(-10)
+yline(0)
+ylim([-50 50])
+title('C2')
+subplot(2, 2, 4)
+plot(groupedData{4})
+yline(10)
+yline(-10)
+yline(0)
+ylim([-50 50])
+title('P2')
+
 
 %%
 for groupedDataNum = 1:4
