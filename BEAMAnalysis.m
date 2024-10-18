@@ -9,8 +9,10 @@ fileNames = uigetfile('Data\Raw\BEAM_DATA\*.csv', "MultiSelect","on");
 %% Process all files
 for fileName = 1:size(fileNames, 2)
     if iscell(fileNames)
+        disp(fileNames{fileName})
         BEAMAnalysisAutomaticCalibration(fileNames{fileName})
     else
+        disp(fileNames)
         BEAMAnalysisAutomaticCalibration(fileNames)
     end
 end
@@ -55,49 +57,62 @@ writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'BNC v IX
 %% Prep For Export - Test-Retest
 sourceDirectory = uigetdir('Data\');
 fileList = dir(sourceDirectory);
-splitFileNames = split(cellfun(@string, {fileList(3:end).name}'), ["_", "."]);
-participantNames = strings(length(unique(splitFileNames(:,2))), 1);
+splitFileNames = split(cellfun(@string, {fileList(3:end).name}'), "_");
 
-for i = 1:size(splitFileNames,1)
-    
-end
-
-deviationTimes = zeros(length(unique(splitFileNames(:,2))), 2);
-deviationPercentages = zeros(length(unique(splitFileNames(:,2))), 2);
-deviationMaxes = zeros(length(unique(splitFileNames(:,2))), 2);
-deviationMeans = zeros(length(unique(splitFileNames(:,2))), 2);
-deviationMedians = zeros(length(unique(splitFileNames(:,2))), 2);
-
-writeRowLocation = 1;
-writeColLocation = 1;
-for i = 1:length(fileList)
-    loadedFileName = fileList(i).name;
-    splitName = split(loadedFileName, '_');
-    if contains(splitName{1}, 'BEAM')
-        load(append(sourceDirectory,'\', loadedFileName))
-        disp(loadedFileName);
-    else
-        continue;
+longitudinalParticipants = strings(2, 1);
+partLoc = 1;
+inRange = 1;
+i = 1;
+while inRange == 1
+    if i > size(splitFileNames, 1)
+        inRange = 0;
+        break;
     end
 
-    if ~contains(participantNames, splitName{2})
-        participantNames(writeRowLocation) = splitName{2};
-        writeColLocation = 1;
-        deviationTimes(writeRowLocation, writeColLocation) = deviations.time;
-        deviationPercentages(writeRowLocation, writeColLocation) = deviations.percentage;
-        deviationMaxes(writeRowLocation, writeColLocation) = deviations.maxSize;
-        deviationMeans(writeRowLocation, writeColLocation) = deviations.meanSize;
-        deviationMedians(writeRowLocation, writeColLocation) = deviations.medianSize;
-        writeRowLocation = writeRowLocation + 1;
+    if sum(strcmp(splitFileNames(i,2), splitFileNames(:,2))) > 1
+        % This participant has both files
+        longitudinalParticipants(partLoc, 1) = join(splitFileNames(i, 1:2), '_');
+        partLoc = partLoc + 1;
+        i = i + 2;
     else
-        writeColLocation = 2;
-        deviationTimes(writeRowLocation, writeColLocation) = deviations.time;
-        deviationPercentages(writeRowLocation, writeColLocation) = deviations.percentage;
-        deviationMaxes(writeRowLocation, writeColLocation) = deviations.maxSize;
-        deviationMeans(writeRowLocation, writeColLocation) = deviations.meanSize;
-        deviationMedians(writeRowLocation, writeColLocation) = deviations.medianSize;
-    end    
+        % This participant has one file - do nothing
+        i = i + 1;
+    end
 end
+
+deviationTimes = zeros(size(longitudinalParticipants, 1), 2);
+deviationPercentages = zeros(size(longitudinalParticipants, 1), 2);
+deviationMaxes = zeros(size(longitudinalParticipants, 1), 2);
+deviationMeans = zeros(size(longitudinalParticipants, 1), 2);
+deviationMedians = zeros(size(longitudinalParticipants, 1), 2);
+
+writeColLocation = 1;
+fileNameSuffixes = unique(splitFileNames(:,3));
+for i = 1:length(longitudinalParticipants)
+    for j = 1:size(fileNameSuffixes,1)
+        loadedFileName = join([longitudinalParticipants(i) fileNameSuffixes(j)], '_');
+        load(append(sourceDirectory,'\', loadedFileName));
+        disp(loadedFileName);
+
+        if contains(loadedFileName, 'RETEST')
+            writeColLocation = 2;
+        else
+            writeColLocation = 1;
+        end
+    
+        deviationTimes(i,writeColLocation) = deviations.time;
+        deviationPercentages(i,writeColLocation) = deviations.percentage;
+        deviationMaxes(i,writeColLocation) = deviations.maxSize;
+        deviationMeans(i,writeColLocation) = deviations.meanSize;
+        deviationMedians(i,writeColLocation) = deviations.medianSize;
+    end
+end
+
+%%
+outputTable = table(longitudinalParticipants, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians);
+writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Retest ', char(datetime("today")), '.csv'))
+
+
 
 %%
 

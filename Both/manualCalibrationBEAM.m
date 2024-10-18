@@ -24,9 +24,9 @@ function [testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalib
         end
         
         subplot(2,1,1)
-        plot(testDataDetrended.rightEye.X, 'r')
+        plot(abs(testDataDetrended.rightEye.X), 'r')
         hold on
-        plot(testDataDetrended.leftEye.X, 'g')
+        plot(abs(testDataDetrended.leftEye.X), 'g')
         yline(0,'k')
         legend('Right', 'Left')
         
