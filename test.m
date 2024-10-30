@@ -198,7 +198,7 @@ for i = 1:size(data,2)
     while button <= 2
         drawnow
         [x, y, button] = ginput(1);
-        [breakflag, lineLocation, startAndEndLocations] = CoG_buttonPressed(x, button, lineLocation, startAndEndLocations, startXLine, endXLine);
+        [breakflag, lineLocation, startAndEndLocations] = CoG_buttonPressed(round(x), button, lineLocation, startAndEndLocations, startXLine, endXLine);
         breakflag
         button
         if breakflag == true

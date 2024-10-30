@@ -114,7 +114,59 @@ writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Ret
 
 
 
-%%
+%% ARVO Export
+% Pull only patient files
+fileNames = uigetfile('Data\Final\BEAM_DATA\*.mat', "MultiSelect","on")';
+filePath = 'C:\Users\VNEL\Documents\GitHub\BeamAnalysis\Data\Final';
+
+% Metrics to pull
+% Percentage - Also convert to OCS
+% Mean/Median Deviations 
+
+timepoint = zeros(size(fileNames));
+percentages = zeros(size(fileNames));
+BEAMofficeControlScore = cell(size(fileNames));
+meanDeviation = zeros(size(fileNames));
+medianDeviation = zeros(size(fileNames));
+
+for i = 1:length(fileNames)
+    load(append(filePath,'\', fileNames{i}));
+    disp(fileNames{i})
+
+    if contains(fileNames{i}, 'RETEST')
+        timepoint(i) = 1;
+    else
+        timepoint(i) = 0;
+    end
+    
+    percentages(i) = deviations.percentage;
+    meanDeviation(i) = deviations.meanSize;
+    medianDeviation(i) = deviations.medianSize;
+
+    if deviations.percentage == 100
+        BEAMofficeControlScore(i) = {'5'};
+    elseif deviations.percentage < 100 && deviations.percentage >= 50
+        BEAMofficeControlScore(i) = {'4'};
+    elseif deviations.percentage < 50 && deviations.percentage > 0
+        BEAMofficeControlScore(i) = {'3'};
+    else
+        BEAMofficeControlScore(i) = {'2 or less'};
+    end
+end
+
+outputTable = table(fileNames, timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
+writetable(outputTable, append(extractBefore(filePath, 'Data'), 'BEAM ARVO Export ', char(datetime("today")), '.csv'))
+
+
+
+
+
+
+
+
+
+
+
 
 
 

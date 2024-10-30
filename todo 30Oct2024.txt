@@ -1,0 +1,7 @@
+Subplot
+Both
+Right
+Left
+If click in right, change right
+If click in left, change left
+Update after both have left and right click
