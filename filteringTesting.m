@@ -42,7 +42,7 @@ dummy = movmedian(dummy, 5*120, 1,'Endpoints', 'shrink');
 
 subtracted = abs(dummy(:,1))-abs(dummy(:,2));
 fps = testDataCalibrated.fps;
-numSecs = 2;
+numSecs = 10;
 groupByFPS = fps * numSecs;
 groupedPlaceholder = zeros(ceil(size(subtracted, 1)/groupByFPS), 1);
 loc = 1;

@@ -24,9 +24,10 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     %% Filter Data
     testDataFiltered = filterBEAMData(testDataCalibrated);
     
-    %% Check Calibration and Detrend Data
+    %% Check Calibration and Centering, then Detrend Data
     close all
-    [testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
+    testDataCentered = manualCenteringBEAM(testDataFiltered);
+    [testDataCentered, testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
     testDataDetrended = detrendBEAMData(testDataFiltered);
     
     %% Save Processed Data

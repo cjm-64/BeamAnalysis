@@ -345,7 +345,16 @@ while ishandle(1)
     calibrationCoeffs.leftEye = input("Left eye coeff: ");
 end
 
+%% Grouping to lower temporality to binary classification 
 
+rawData = [testDataCalibrated.rightEye.X testDataCalibrated.leftEye.X];
+
+grouping = zeros(360, 2, ceil(size(rawData, 1)/360));
+loc = 1;
+for i = 1:360:size(rawData,1)-360
+    grouping(:, :, loc) = rawData(i:i+359, :);
+    loc = loc + 1;
+end
 
 
 

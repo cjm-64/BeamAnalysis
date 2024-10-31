@@ -1,4 +1,4 @@
-function [testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
+function [testDataCentered, testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
     figure("Position",[1722 42 1718 1314])
     
     while ishandle(1)
@@ -8,21 +8,21 @@ function [testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalib
         testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
         testDataFiltered = filterBEAMData(testDataCalibrated); 
         testDataDetrended = detrendBEAMData(testDataFiltered);
-        testDataFinal = getFinalData(testDataDetrended);
-    
-        threshold = 10;
-        deviations = calculateDeviations(testDataFinal, threshold);
-        if ~isnan(deviations.X.startAndEnds(1,1)) 
-            deviations.percentage = (sum(deviations.X.lengths(:,2))/max(testDataFinal.time))*100;
-            deviations.meanSize = mean(deviations.X.magnitude(:,1));
-            deviations.medianSize = median(deviations.X.magnitude(:,1))
-        else
-            deviations.percentage = 0;
-            deviations.meanSize = 0;
-            deviations.medianSize = 0;
-            disp ("No Deviations")
-        end
-        
+%         testDataFinal = getFinalData(testDataDetrended);
+%     
+%         threshold = 10;
+%         deviations = calculateDeviations(testDataFinal, threshold);
+%         if ~isnan(deviations.X.startAndEnds(1,1)) 
+%             deviations.percentage = (sum(deviations.X.lengths(:,2))/max(testDataFinal.time))*100;
+%             deviations.meanSize = mean(deviations.X.magnitude(:,1));
+%             deviations.medianSize = median(deviations.X.magnitude(:,1))
+%         else
+%             deviations.percentage = 0;
+%             deviations.meanSize = 0;
+%             deviations.medianSize = 0;
+%             disp ("No Deviations")
+%         end
+%         
         subplot(2,1,1)
         plot(abs(testDataDetrended.rightEye.X), 'r')
         hold on
