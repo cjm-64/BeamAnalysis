@@ -6,14 +6,16 @@ makeBEAMDataLocations()
 %% Get File Names
 fileNames = uigetfile('Data\Raw\BEAM_DATA\*.csv', "MultiSelect","on");
 
+
 %% Process all files
-for fileName = 1:size(fileNames, 2)
-    if iscell(fileNames)
+
+if ~iscell(fileNames)
+    disp(fileNames)
+    BEAMAnalysisAutomaticCalibration(fileNames)
+else
+    for fileName = 1:size(fileNames, 2)
         disp(fileNames{fileName})
         BEAMAnalysisAutomaticCalibration(fileNames{fileName})
-    else
-        disp(fileNames)
-        BEAMAnalysisAutomaticCalibration(fileNames)
     end
 end
 

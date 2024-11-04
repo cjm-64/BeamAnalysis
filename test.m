@@ -183,7 +183,7 @@ close 1
 
 
 data = [TDFil.rightEye.X, TDFil.leftEye.X];
-fig1 = figure();
+calibrationFigure = figure();
 line1 = plot(data(:,1));
 line2 = yline(0,'k');
 startXLine = xline(1, 'g');
@@ -236,7 +236,7 @@ calSide = fieldnames(calibrationDataRaw);
 locations = zeros(12,2);
 loc = 1;
 
-fig1 = figure();
+calibrationFigure = figure();
 line1 = plot(calibrationDataRaw.rightCal.fivePD.rightEye.X);
 line2 = yline(0,'k');
 startXLine = xline(1, 'g');
@@ -355,6 +355,100 @@ for i = 1:360:size(rawData,1)-360
     grouping(:, :, loc) = rawData(i:i+359, :);
     loc = loc + 1;
 end
+
+%% Combinging calibration and centering
+
+set(0, 'units', 'pixels')
+screenSizePixel = get(0,'screensize');
+
+close all
+calibrationFigure = figure("Position",[screenSizePixel(3)/2 + 2 42 ...
+    screenSizePixel(3)/2 - 2 screenSizePixel(4)-126]);
+
+xLines = [1, size(testDataFiltered.rightEye.X, 1); 1, size(testDataFiltered.leftEye.X, 1)];
+
+while ishandle(1)
+    clf
+    testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
+    testDataFiltered = filterBEAMData(testDataCalibrated); 
+    [testDataDetrended, xLines] = manualCenteringBEAM(detrendBEAMData(testDataFiltered), xLines);
+
+    calibrationCoeffs
+
+    subplot(2,1,1)
+    plot(testDataDetrended.rightEye.X, 'r')
+    hold on
+    plot(testDataDetrended.leftEye.X, 'g')
+    yline(0,'k')
+    legend('Right', 'Left')
+    hold off
+    
+    subplot(2, 1, 2)
+    plot(testDataDetrended.rightEye.X - testDataDetrended.leftEye.X)
+    yline(10, '--r')
+    yline(-10, '--r')
+    yline(0, 'k')
+    ylim([-50,50])
+
+    rCoeff = input("Right eye coeff: ");
+    if ~isempty(rCoeff)
+        calibrationCoeffs.rightEye = rCoeff;
+    end
+
+    lCoeff = input("Left eye coeff: ");
+    if ~isempty(lCoeff)
+        calibrationCoeffs.leftEye = lCoeff;
+    end
+    clear rCoeff lCoeff;
+
+end
+
+
+%% 
+clear zdata
+% data = [testDataDetrended.rightEye.X, testDataDetrended.leftEye.X];
+data = testDataFinal.X;
+averages = mean(data,1);
+standardDevs = std(data,1);
+zdata(:,1) = (data(:,1) - averages(1))/standardDevs(1);
+% zdata(:,2) = (data(:,2) - averages(2))/standardDevs(2);
+figure()
+histogram(zdata(:,1))
+
+%% 
+figure()
+histogram(testDataFinal.X,'BinWidth', 2)
+
+%%
+
+files = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+allData = cell(size(files, 2), 3);
+
+for i = 1:length(files)
+    disp(files{i})
+    load(append('Data\Final\', files{i}))
+    allData(i,1) = {testDataFinal.X};
+    allData(i,2) = {mean(testDataFinal.X)};
+    allData(i,3) = {std(testDataFinal.X)};
+end
+
+allMeans = mean([allData{:,2}])
+allStD = mean([allData{:,3}])
+
+%% 
+files = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+allData = cell(size(files, 2), 3);
+
+for i = 1:length(files)
+    disp(files{i})
+    load(append('Data\Final\', files{i}))
+    allData(i,1) = {testDataFinal.X};
+    allData(i,2) = {mean(testDataFinal.X)};
+    allData(i,3) = {std(testDataFinal.X)};
+end
+
+allMeans = mean([allData{:,2}])
+allStD = mean([allData{:,3}])
 
 
 

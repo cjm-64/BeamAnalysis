@@ -3,7 +3,6 @@ function deviations = getDeviations(data, threshold, fps)
     isDeviated = false;
     deviations = NaN(2,1);
     frames2sec = 10*fps;
-    data = abs(data);
     for i = 1:size(data, 1)
         % Data is deviated (above threshold)
         if data(i) > threshold

@@ -26,9 +26,7 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     
     %% Check Calibration and Centering, then Detrend Data
     close all
-    testDataCentered = manualCenteringBEAM(testDataFiltered);
-    [testDataCentered, testDataCalibrated, testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
-    testDataDetrended = detrendBEAMData(testDataFiltered);
+    [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
     
     %% Save Processed Data
     save(strcat('Data/Processed/', fileName, '.mat'), "testDataCentered", "testDataCalibrated", "testDataFiltered", "testDataDetrended")
@@ -59,9 +57,7 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     end
     
     save(strcat('Data/Metrics/', fileName, '.mat'), "threshold", "deviations")
-    
-    %% Do Z score for histogram
-    
+        
     %% Save all data to one file
     save(strcat('Data/Final/', fileName, '.mat'), '-regexp', '^(?!(importedData|threshold)$).')
 end
