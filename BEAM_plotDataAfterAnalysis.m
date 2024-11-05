@@ -66,7 +66,7 @@ title('Short recording of IXT patient with deviations')
 
 %% Plot histogram
 figure()
-histogram(testDataFinal.X, 'BinWidth', 5, 'FaceColor', 'c')
+histogram(testDataFinal.X, 'BinWidth', 2, 'FaceColor', 'c')
 xlabel('Prism Diopters')
 ylabel('Frame Count')
 title('Histogram of deviation over time')

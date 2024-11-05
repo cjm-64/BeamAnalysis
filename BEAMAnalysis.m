@@ -118,7 +118,7 @@ writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Ret
 
 %% ARVO Export
 % Pull only patient files
-fileNames = uigetfile('Data\Final\BEAM_DATA\*.mat', "MultiSelect","on")';
+fileNames = uigetfile('Data\Final\*.mat', "MultiSelect","on")';
 filePath = 'C:\Users\VNEL\Documents\GitHub\BeamAnalysis\Data\Final';
 
 % Metrics to pull

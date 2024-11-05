@@ -6,8 +6,8 @@ function testDataFinal = getFinalData(testDataFiltered)
             continue;
         else
             % Subtrat left from right
-%             testDataFinal.(directions{dir}) = abs(testDataFiltered.rightEye.(directions{dir})) - abs(testDataFiltered.leftEye.(directions{dir}));
-            testDataFinal.(directions{dir}) = testDataFiltered.rightEye.(directions{dir}) - testDataFiltered.leftEye.(directions{dir});
+            testDataFinal.(directions{dir}) = abs(testDataFiltered.rightEye.(directions{dir})) - abs(testDataFiltered.leftEye.(directions{dir}));
+%             testDataFinal.(directions{dir}) = testDataFiltered.rightEye.(directions{dir}) - testDataFiltered.leftEye.(directions{dir});
 
 % 
 %             %linear detrend of result

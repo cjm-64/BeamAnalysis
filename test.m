@@ -445,15 +445,48 @@ for i = 1:length(files)
     allData(i,1) = {testDataFinal.X};
     allData(i,2) = {mean(testDataFinal.X)};
     allData(i,3) = {std(testDataFinal.X)};
+    figure()
+    histogram(testDataFinal.X,'BinWidth', 2)
+    title(files{i}, Interpreter="none")
 end
 
 allMeans = mean([allData{:,2}])
 allStD = mean([allData{:,3}])
 
 
+%% Quick test for increasing threshold
+files = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+allData = zeros(ceil(size(files, 2)/2), 3);
+loc = 1;
+for i = 1:length(files)
+    disp(files{i})
+    load(append('Data\Final\', files{i}))
 
+    threshold = 10;
+    deviations = calculateDeviations(testDataFinal, threshold);
+    if ~isnan(deviations.X.startAndEnds(1,1)) 
+        deviations.time = sum(deviations.X.lengths(:,2));
+        deviations.percentage = (sum(deviations.X.lengths(:,2))/max(testDataFinal.time))*100;
+        deviations.maxSize = max(deviations.X.magnitude(:,1));
+        deviations.meanSize = mean(deviations.X.magnitude(:,1));
+        deviations.medianSize = median(deviations.X.magnitude(:,1))
+    else
+        deviations.time = 0;
+        deviations.percentage = 0;
+        deviations.maxSize = 0;
+        deviations.meanSize = 0;
+        deviations.medianSize = 0;
+        disp ("No Deviations")
+    end
+    if mod(i,2) == 0
+        allData(loc, 2) = deviations.percentage;
+        loc = loc + 1;
+    else
+        allData(loc, 1) = deviations.percentage;
+    end
 
-
+end
+[r, LB, UB,F, df1, df2, p] = ICC(allData(:,1:2), '1-1', 0.05)
 
 
 
