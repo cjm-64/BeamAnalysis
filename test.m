@@ -456,37 +456,146 @@ allStD = mean([allData{:,3}])
 
 %% Quick test for increasing threshold
 files = uigetfile('Data\Final\*.mat', "MultiSelect","on");
-allData = zeros(ceil(size(files, 2)/2), 3);
+
+thresholdAmounts = 1:10;
+deviationPercentages = zeros(length(fileNames)/2, length(thresholdAmounts)*2);
+
 loc = 1;
-for i = 1:length(files)
-    disp(files{i})
-    load(append('Data\Final\', files{i}))
-
-    threshold = 10;
-    deviations = calculateDeviations(testDataFinal, threshold);
-    if ~isnan(deviations.X.startAndEnds(1,1)) 
-        deviations.time = sum(deviations.X.lengths(:,2));
-        deviations.percentage = (sum(deviations.X.lengths(:,2))/max(testDataFinal.time))*100;
-        deviations.maxSize = max(deviations.X.magnitude(:,1));
-        deviations.meanSize = mean(deviations.X.magnitude(:,1));
-        deviations.medianSize = median(deviations.X.magnitude(:,1))
-    else
-        deviations.time = 0;
-        deviations.percentage = 0;
-        deviations.maxSize = 0;
-        deviations.meanSize = 0;
-        deviations.medianSize = 0;
-        disp ("No Deviations")
+for i = 1:length(fileNames)
+    load(append(filePath,'\', fileNames{i}));
+    disp(fileNames{i})
+    for j = 1:length(thresholdAmounts)
+        threshold = thresholdAmounts(j);
+        deviations = calculateDeviations(testDataFinal, threshold);
+        if ~isnan(deviations.X.startAndEnds(1,1)) 
+            deviations.time = sum(deviations.X.lengths(:,2));
+            deviations.percentage = (sum(deviations.X.lengths(:,2))/max(testDataFinal.time))*100;
+            deviations.maxSize = max(deviations.X.magnitude(:,1));
+            deviations.meanSize = mean(deviations.X.magnitude(:,1));
+            deviations.medianSize = median(deviations.X.magnitude(:,1));
+        else
+            deviations.time = 0;
+            deviations.percentage = 0;
+            deviations.maxSize = 0;
+            deviations.meanSize = 0;
+            deviations.medianSize = 0;
+        end
+        if contains(fileNames{i}, 'RETEST')
+            deviationPercentages(loc, j*2) = deviations.percentage;
+        else
+            deviationPercentages(loc, (j*2)-1) = deviations.percentage;
+            if j == length(thresholdAmounts)
+                loc = loc + 1;
+            end
+        end
     end
-    if mod(i,2) == 0
-        allData(loc, 2) = deviations.percentage;
-        loc = loc + 1;
-    else
-        allData(loc, 1) = deviations.percentage;
-    end
-
 end
-[r, LB, UB,F, df1, df2, p] = ICC(allData(:,1:2), '1-1', 0.05)
+
+outputTable = table(fileNames, deviationPercentages)
+
+[r, LB, UB, F, df1, df2, p] = ICC(M, type, alpha, r0)
+
+resultsICC = zeros(length(thresholdAmounts), 2);
+resultsICC(:,1) = 1:10;
+for i = 1:size(deviationPercentages, 2)/2
+    resultsICC(i,2) = ICC(deviationPercentages(:,(i*2)-1:i*2), '1-1', 0.05);
+end
+
+resultsICC
+
+%% Weight deviation Percentages based on recording lengths - Test Retest
+
+clear
+
+% Load Data
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+% Load Data into Cell Array
+try
+    for cellIndex = 1:size(filePaths,2)
+        testData{cellIndex, 1} = extractBefore(filePaths{cellIndex}, '.mat');
+        testData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
+        deviationData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).deviations.time;
+        deviationData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).deviations.percentage;
+    end
+catch
+    testData{1} = load(filePaths).testDataFinal.X;
+end
+
+% Scale time and percentage by weight
+totalNumberSamples = sum(cellfun(@(x) size(x, 2), testData(:,2)));
+weightForEachRecording = num2cell(cellfun(@(x) size(x, 2)/totalNumberSamples, testData(:,2)));
+timeDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
+percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,2), weightForEachRecording);
+
+% Organize into test-retest
+participantIDs = strings(size(testData, 1), 1);
+organizedTestData = cell(size(testData, 1)/2, 4);
+row = 1;
+nameCol = 1;
+timeCol = 1;
+percentCol = 1;
+for i = 1:size(testData, 1)
+    nameSplit = split(testData{i,1}, '_');
+    if contains(testData{i, 1}, 'RETEST')
+        timeCol = 2;
+        percentCol = 4;
+    else
+        timeCol = 1;
+        percentCol = 3;
+    end
+    if i == 1
+        participantIDs(row) = nameSplit{2};
+    elseif sum(cellfun(@(x) contains(x, nameSplit{2}), participantIDs(:,1))) == 0 && i ~= 1
+        row = row + 1;
+        participantIDs(row) = nameSplit{2};
+    end
+    organizedTestData{row, timeCol} = timeDeviationForEachRecording(i,1);
+    organizedTestData{row, percentCol} = percentDeviationForEachRecording(i,1);
+end
+
+[r, LB, UB,F, df1, df2, p] = ICC(cell2mat(organizedTestData(:,3:4)), '1-1', 0.05)
+
+%% Weight deviation Percentages based on recording lengths - IXT v BNC
+
+% Load Data
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+% Load Data into Cell Array
+try
+    for cellIndex = 1:size(filePaths,2)
+        testData{cellIndex} = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
+        deviationData{cellIndex} = load(append(fileRoot, filePaths{cellIndex})).deviations.percentage;
+    end
+catch
+    testData{1} = load(filePaths).testDataFinal.X;
+end
+
+
+totalNumberSamples = sum(cellfun(@(x) size(x, 1), testData));
+weightForEachRecording = num2cell(cellfun(@(x) size(x, 1)/totalNumberSamples, testData));
+percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData, weightForEachRecording);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

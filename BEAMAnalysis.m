@@ -118,8 +118,7 @@ writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Ret
 
 %% ARVO Export
 % Pull only patient files
-fileNames = uigetfile('Data\Final\*.mat', "MultiSelect","on")';
-filePath = 'C:\Users\VNEL\Documents\GitHub\BeamAnalysis\Data\Final';
+[fileNames, filePath] = uigetfile('Data\Final\*.mat', "MultiSelect","on")';
 
 % Metrics to pull
 % Percentage - Also convert to OCS

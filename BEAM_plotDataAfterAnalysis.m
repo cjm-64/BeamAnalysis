@@ -61,12 +61,13 @@ end
 ylim([-50, 50])
 xlabel('Time (s)')
 ylabel('<--- Left Eye Trope      Prism Diopters (PD)      Right Eye Trope --->')
-title('Short recording of IXT patient with deviations')
+title(input('Title the Graph: ', 's'))
 
 
 %% Plot histogram
 figure()
-histogram(testDataFinal.X, 'BinWidth', 2, 'FaceColor', 'c')
+% histogram(abs(testDataFinal.X), 'BinWidth', 2, 'FaceColor', 'c')
+histogram(testDataFinal.X, 'FaceColor', 'c')
 xlabel('Prism Diopters')
 ylabel('Frame Count')
 title('Histogram of deviation over time')
