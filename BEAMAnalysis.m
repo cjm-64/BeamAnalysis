@@ -118,21 +118,25 @@ writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Ret
 
 %% ARVO Export
 % Pull only patient files
-[fileNames, filePath] = uigetfile('Data\Final\*.mat', "MultiSelect","on")';
+[fileNames, filePath] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 
 % Metrics to pull
 % Percentage - Also convert to OCS
 % Mean/Median Deviations 
-
-timepoint = zeros(size(fileNames));
-percentages = zeros(size(fileNames));
-BEAMofficeControlScore = cell(size(fileNames));
-meanDeviation = zeros(size(fileNames));
-medianDeviation = zeros(size(fileNames));
+%%
+arraySize = flip(size(fileNames));
+name = strings(arraySize);
+timepoint = zeros(arraySize);
+percentages = zeros(arraySize);
+BEAMofficeControlScore = cell(arraySize);
+meanDeviation = zeros(arraySize);
+medianDeviation = zeros(arraySize);
 
 for i = 1:length(fileNames)
     load(append(filePath,'\', fileNames{i}));
     disp(fileNames{i})
+    splitFileName = split(fileNames{i}, '_');
+    name(i) = splitFileName{2};
 
     if contains(fileNames{i}, 'RETEST')
         timepoint(i) = 1;
@@ -155,7 +159,7 @@ for i = 1:length(fileNames)
     end
 end
 
-outputTable = table(fileNames, timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
+outputTable = table(fileNames', timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
 writetable(outputTable, append(extractBefore(filePath, 'Data'), 'BEAM ARVO Export ', char(datetime("today")), '.csv'))
 
 

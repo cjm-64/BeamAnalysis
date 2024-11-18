@@ -574,11 +574,82 @@ end
 
 totalNumberSamples = sum(cellfun(@(x) size(x, 1), testData));
 weightForEachRecording = num2cell(cellfun(@(x) size(x, 1)/totalNumberSamples, testData));
-percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData, weightForEachRecording);
+percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData, weightForEachRecording)';
 
+%% Downsampling to 1 sec for histograms
 
+% Load Data
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 
+closestUpperSquareRoot = ceil(sqrt(size(filePaths, 2)));
 
+fps = 120;
+numSecs = 1;
+groupByFPS = fps * numSecs;
+groupedData = cell(flip(size(filePaths)));
+figure()
+for cellIndex = 1:size(filePaths,2)
+    testData = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
+    inRange = 1;
+    windowStartLoc = 1;
+    groupedPlaceholder = zeros(ceil(size(testData, 1)/groupByFPS), 1);
+    loc = 1;
+    while inRange == 1
+        windowEndLoc = windowStartLoc + groupByFPS-1;
+        if windowEndLoc < size(testData, 1)
+            % Window end in range, group full window
+            groupedPlaceholder(loc) = mean(testData(windowStartLoc:windowStartLoc+groupByFPS));
+            windowStartLoc = windowEndLoc;
+            loc = loc + 1;
+        else
+            % Window end out of range, group up to end
+            groupedPlaceholder(loc) = mean(testData(windowStartLoc:size(testData, 1)));
+            inRange = 0;
+        end
+    end
+    groupedData(cellIndex) = {groupedPlaceholder};
+    subplot(closestUpperSquareRoot, closestUpperSquareRoot, cellIndex)
+    histogram(groupedPlaceholder, 'BinWidth', 2)
+    xlim([-45 45])
+    ylim([0 3000])
+    title(extractBefore(filePaths{cellIndex}, '.mat'), "Interpreter","none")
+end
+
+%% Create everage traces for each group and time point
+clear
+
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+testData = cell(flip(size(filePaths)));
+% Load Data into Cell Array
+try
+    for cellIndex = 1:size(filePaths,2)
+        testData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
+    end
+catch
+    testData{1} = load(filePaths).testDataFinal.X;
+end
+
+dummy = nan(max(cellfun(@max, cellfun(@size, testData, 'UniformOutput', false))), size(testData, 1));
+for i = 1:size(testData, 1)
+    dummy(1:length(testData{i, 1}), i) = testData{i, 1};
+end
+
+figure()
+plot(linspace(0, 90, size(dummy, 1)), mean(dummy, 2, 'omitnan'));
+yline(0, 'k')
+ylim([-15 15])
+xlabel('Time (min)')
+ylabel('<-OS Trope   Deviation(PD)   OD Trope->')
+figTitle = input('Input title of figure: ', 's');
+title(figTitle)
+
+%% 
+
+plot(downsample(testDataCentered.rightEye.X, 120), 'r')
+hold on
+plot(downsample(testDataCentered.leftEye.X, 120), 'g')
 
 
 

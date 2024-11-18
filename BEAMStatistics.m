@@ -33,7 +33,62 @@ for i = 1:length(fileList)
         loc = loc + 1;
     end
 end
-[r, LB, UB,F, df1, df2, p] = ICC(allData(:,1:2), '1-1', 0.05)
+[r, LB, UB,F, df1, df2, p] = ICC(allData(:,1:2), '1-1', 0.05);
+
+%% Weight deviation Percentages based on recording lengths - Test Retest
+
+clear
+
+% Load Data
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+% Load Data into Cell Array
+try
+    for cellIndex = 1:size(filePaths,2)
+        testData{cellIndex, 1} = extractBefore(filePaths{cellIndex}, '.mat');
+        testData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
+        deviationData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).deviations.time;
+        deviationData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).deviations.percentage;
+    end
+catch
+    testData{1} = load(filePaths).testDataFinal.X;
+end
+
+% Scale time and percentage by weight
+totalNumberSamples = sum(cellfun(@(x) size(x, 2), testData(:,2)));
+weightForEachRecording = num2cell(cellfun(@(x) size(x, 2)/totalNumberSamples, testData(:,2)));
+timeDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
+percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,2), weightForEachRecording);
+
+% Organize into test-retest
+participantIDs = strings(size(testData, 1), 1);
+organizedTestData = cell(size(testData, 1)/2, 4);
+row = 1;
+nameCol = 1;
+timeCol = 1;
+percentCol = 1;
+for i = 1:size(testData, 1)
+    nameSplit = split(testData{i,1}, '_');
+    if contains(testData{i, 1}, 'RETEST')
+        timeCol = 2;
+        percentCol = 4;
+    else
+        timeCol = 1;
+        percentCol = 3;
+    end
+    if i == 1
+        participantIDs(row) = nameSplit{2};
+    elseif sum(cellfun(@(x) contains(x, nameSplit{2}), participantIDs(:,1))) == 0 && i ~= 1
+        row = row + 1;
+        participantIDs(row) = nameSplit{2};
+    end
+    organizedTestData{row, timeCol} = timeDeviationForEachRecording(i,1);
+    organizedTestData{row, percentCol} = percentDeviationForEachRecording(i,1);
+end
+
+[r, LB, UB,F, df1, df2, p] = ICC(cell2mat(organizedTestData(:,3:4)), '1-1', 0.05);
+
+
 
 %% BNC vs IXT
 % Load all files 
@@ -72,6 +127,77 @@ secondRecordingTable = table(secondRecordingParticipantName, secondRecordingData
 
 writetable(firstRecordingTable, append(extractBefore(sourceDirectory, 'Data'), 'BNC v IXT First Recording ', char(datetime("today")), '.csv'))
 writetable(secondRecordingTable, append(extractBefore(sourceDirectory, 'Data'), 'BNC v IXT Second Recording ', char(datetime("today")), '.csv'))
+
+%% Weight deviation Percentages based on recording lengths - IXT v BNC
+
+clear
+
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+testData = cell(flip(size(filePaths)));
+deviationData = cell(size(filePaths, 2), 2);
+maxDeviationSize = zeros(flip(size(filePaths)));
+meanDeviationSize = zeros(flip(size(filePaths)));
+medianDeviationSize = zeros(flip(size(filePaths)));
+% Load Data into Cell Array
+try
+    for cellIndex = 1:size(filePaths,2)
+        testData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
+        deviationData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).deviations.time;
+        deviationData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).deviations.percentage;
+        maxDeviationSize(cellIndex) = load(append(fileRoot, filePaths{cellIndex})).deviations.maxSize;
+        meanDeviationSize(cellIndex) = load(append(fileRoot, filePaths{cellIndex})).deviations.meanSize;
+        medianDeviationSize(cellIndex) = load(append(fileRoot, filePaths{cellIndex})).deviations.medianSize;
+    end
+catch
+    testData{1} = load(filePaths).testDataFinal.X;
+end
+
+% Calculate total weight
+totalNumberSamples = sum(cellfun(@(x) size(x, 1), testData));
+weightForEachRecording = num2cell(cellfun(@(x) size(x, 1)/totalNumberSamples, testData));
+weightedTimeOfDeviation = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
+weightedPercentDeviated = cellfun(@(x, y) x.*y, deviationData(:,2), weightForEachRecording);
+
+% Organize data into Test and Retest
+participantIDs = strings(size(filePaths, 2), 1);
+timepoint = zeros(size(participantIDs));
+isControl = zeros(size(participantIDs));
+
+tries = 1;
+while tries < 10
+    controlOrPatient = input('Is this data Controls (1) or Patient (0): ');
+    if controlOrPatient == 0 || controlOrPatient == 1
+        isControl = isControl + controlOrPatient;
+        break
+    else
+        disp('Please input either 1 for controls or 0 for patients')
+        tries = tries + 1;
+    end
+end
+
+
+for fileIndex = 1:size(filePaths, 2)
+    nameSplit = split(filePaths{1,fileIndex}, '_');
+    participantIDs(fileIndex, 1) = nameSplit{2};
+    if contains(filePaths{1,fileIndex}, 'RETEST')
+        timepoint(fileIndex) = 1;
+    else
+        timepoint(fileIndex) = 0;
+    end
+end
+
+outputTable = table(participantIDs, timepoint, isControl, weightedTimeOfDeviation, weightedPercentDeviated, maxDeviationSize, meanDeviationSize, medianDeviationSize);
+
+if controlOrPatient == 1
+    fileTitle = 'BNC Data ';
+else
+    fileTitle = 'IXT Data ';
+end
+writetable(outputTable, append(extractBefore(fileRoot, 'Data'), fileTitle, char(datetime("today")), '.csv'))
+
+
 
 
 
