@@ -1,5 +1,5 @@
-function [testDataFiltered, xLines] = manualCenteringBEAM(testDataFiltered, xLines)
-    data = [testDataFiltered.rightEye.X, testDataFiltered.leftEye.X];
+function [testDataFiltered, xLines] = manualCenteringBEAM(testDataFiltered, xLines, calibrationCoeffs)
+    data = [testDataFiltered.rightEye.X, testDataFiltered.leftEye.X, zeros(size(testDataFiltered.rightEye.X, 1), 1)];
     
 
     if ~ishandle(1)
@@ -10,9 +10,7 @@ function [testDataFiltered, xLines] = manualCenteringBEAM(testDataFiltered, xLin
     end
 
     while ishandle(1)
-        data(:,1) = data(:,1) - mean(data(round(xLines(1,1)):round(xLines(1,2)),1));
-        data(:,2) = data(:,2) - mean(data(round(xLines(2,1)):round(xLines(2,2)),2));
-        data(:,3) = abs(data(:,1)) - abs(data(:,2));
+        data(:,3) = abs(data(:,1)) - abs(data(:,2));       
 
         subplot(3, 1, 1)
         totalPlotData = plot(data(:,3));
@@ -45,12 +43,13 @@ function [testDataFiltered, xLines] = manualCenteringBEAM(testDataFiltered, xLin
             else
                 if contains(gca().Title.String, 'Right')
                     xLines(1,:) = setCenterWindowBoundaries(x, xLines(1,:), button);
+                    data(:,1) = data(:,1) - mean(data(round(xLines(1,1)):round(xLines(1,2)),1));
                 else
                     xLines(2,:) = setCenterWindowBoundaries(x, xLines(2,:), button);
+                    data(:,2) = data(:,2) - mean(data(round(xLines(2,1)):round(xLines(2,2)),2));
                 end
-            end
-        end
-    
+            end            
+        end    
     end
     
     testDataFiltered.rightEye.X = data(:,1);

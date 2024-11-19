@@ -10,13 +10,13 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     save(strcat('Data/Preprocessed/', fileName, '.mat'), "calibrationDataRaw", "testDataRaw")
     
     %% Get calibration coeffs and save
-    offsets = zeros(5,6);
-    [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw, offsets, 1);
     
-    save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs", "offsets")
+    calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw);
+    
+    save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs")
     
     %% Center Data
-    testDataCentered = centerData(testDataRaw);
+    testDataCentered = centerData(testDataRaw, calibrationCoeffs);
     
     %% Apply Calibration
     testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);

@@ -1,5 +1,5 @@
-function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered, offsets, fileNum)
-    offsets(4, :, fileNum) = [-15:5:-5, 5:5:15];
+function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered, offsets)
+    offsets(5, :) = [-15:5:-5, 5:5:15];
     figure()
     
     
@@ -31,9 +31,8 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     legend('raw', 'filtered')
     title('Fifteen Right Eye')
     
-    offsets(1,1,fileNum) = mean(calibrationDataFiltered.leftCal.fifteenPD.rightEye.X);
-    offsets(2,1,fileNum) = mean(calibrationDataFiltered.rightCal.fifteenPD.rightEye.X);
-    offsets(3,1,fileNum) = offsets(1,1,fileNum) - offsets(2,1,fileNum);
+    offsets(1,1) = mean(calibrationDataFiltered.leftCal.fifteenPD.rightEye.X);
+    offsets(2,1) = mean(calibrationDataFiltered.rightCal.fifteenPD.rightEye.X);
     
     
     
@@ -65,9 +64,8 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     legend('raw', 'filtered')
     title('Ten Right Eye')
     
-    offsets(1,2,fileNum) = mean(calibrationDataFiltered.leftCal.tenPD.rightEye.X);
-    offsets(2,2,fileNum) = mean(calibrationDataFiltered.rightCal.tenPD.rightEye.X);
-    offsets(3,2,fileNum) = offsets(1,2,fileNum) - offsets(2,2,fileNum);
+    offsets(1,2) = mean(calibrationDataFiltered.leftCal.tenPD.rightEye.X);
+    offsets(2,2) = mean(calibrationDataFiltered.rightCal.tenPD.rightEye.X);
     
     % 5 Right Eye
     subplot(6, 3, 1)
@@ -97,9 +95,8 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     legend('raw', 'filtered')
     title('Five Right Eye')
     
-    offsets(1,3,fileNum) = mean(calibrationDataFiltered.leftCal.fivePD.rightEye.X);
-    offsets(2,3,fileNum) = mean(calibrationDataFiltered.rightCal.fivePD.rightEye.X);
-    offsets(3,3,fileNum) = offsets(1,3,fileNum) - offsets(2,3,fileNum);
+    offsets(1,3) = mean(calibrationDataFiltered.leftCal.fivePD.rightEye.X);
+    offsets(2,3) = mean(calibrationDataFiltered.rightCal.fivePD.rightEye.X);
     
     % 5 Left Eye
     subplot(6, 3, 10)
@@ -129,9 +126,8 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     legend('raw', 'filtered')
     title('Five Left Eye')
     
-    offsets(1,4,fileNum) = mean(calibrationDataFiltered.leftCal.fivePD.leftEye.X);
-    offsets(2,4,fileNum) = mean(calibrationDataFiltered.rightCal.fivePD.leftEye.X);
-    offsets(3,4,fileNum) = offsets(1,4,fileNum) - offsets(2,4,fileNum);
+    offsets(1,4) = mean(calibrationDataFiltered.leftCal.fivePD.leftEye.X);
+    offsets(2,4) = mean(calibrationDataFiltered.rightCal.fivePD.leftEye.X);
     
     
     % 10 Left Eye
@@ -162,9 +158,8 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     legend('raw', 'filtered')
     title('Ten Left Eye')
     
-    offsets(1,5,fileNum) = mean(calibrationDataFiltered.leftCal.tenPD.leftEye.X);
-    offsets(2,5,fileNum) = mean(calibrationDataFiltered.rightCal.tenPD.leftEye.X);
-    offsets(3,5,fileNum) = offsets(1,5,fileNum) - offsets(2,5,fileNum);
+    offsets(1,5) = mean(calibrationDataFiltered.leftCal.tenPD.leftEye.X);
+    offsets(2,5) = mean(calibrationDataFiltered.rightCal.tenPD.leftEye.X);
     
     % 15 Left Eye
     subplot(6, 3, 16)
@@ -194,12 +189,11 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     legend('raw', 'filtered')
     title('Fifteen Left Eye')
     
-    offsets(1,6,fileNum) = mean(calibrationDataFiltered.leftCal.fifteenPD.leftEye.X);
-    offsets(2,6,fileNum) = mean(calibrationDataFiltered.rightCal.fifteenPD.leftEye.X);
-    offsets(3,6,fileNum) = offsets(1,6,fileNum) - offsets(2,6,fileNum);
-    offsets(5, :) = mean(offsets(1:2, :), 1);
-    fprintf('Right Eye Center: ~%.0f\n', median(offsets(5, 1:3)));
-    fprintf('Left Eye Center: ~%.0f\n', median(offsets(5, 4:6)));
+    offsets(1,6) = mean(calibrationDataFiltered.leftCal.fifteenPD.leftEye.X);
+    offsets(2,6) = mean(calibrationDataFiltered.rightCal.fifteenPD.leftEye.X);
+
+    offsets(3,:) = offsets(1,:) - offsets(2,:);
+    offsets(4, :) = mean(offsets(1:2, :), 1);
 end
 
 %%

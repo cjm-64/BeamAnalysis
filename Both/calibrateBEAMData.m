@@ -10,7 +10,7 @@ function testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoe
                 if directions(dir) == "Radius" || directions(dir) == "Found"
                     testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir});
                 else
-                    testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir})./calibrationCoeffs.(names{name});
+                    testDataCalibrated.(names{name}).(directions{dir}) = testDataCentered.(names{name}).(directions{dir})./calibrationCoeffs.(names{name}).value;
                 end                
             end
         end

@@ -1,4 +1,4 @@
-function [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw,offsets, fileNum)
+function calibrationCoeffs = getCalibrationCoeffs(calibrationDataRaw)
     
     %% Filter calibration Data
     calibrationDataFiltered = filterBEAMCalData(calibrationDataRaw);
@@ -7,6 +7,7 @@ function [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw,
     PD = [5 10 15];
     rightCoeffs = zeros(3, 1);
     leftCoeffs = zeros(3, 1);
+    offsets = zeros(5,6);
     
     rotationAmounts = fieldnames(calibrationDataFiltered.rightCal);
     for amt = 1:numel(rotationAmounts)
@@ -24,37 +25,43 @@ function [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw,
         end
     end
 
+    calibrationCoeffs.rightEye.isValid = false;
     if mean(abs(rightCoeffs)) < 0.5 || mean(abs(rightCoeffs)) > 0.9
         warning('Right eye out of bounds')
         if mean(abs(leftCoeffs)) > 0.5 && mean(abs(leftCoeffs)) < 0.9
-            calibrationCoeffs.rightEye = mean(abs(leftCoeffs));
+            calibrationCoeffs.rightEye.value = mean(abs(leftCoeffs));
         else
             if mean(abs(rightCoeffs)) < 0.5
-                calibrationCoeffs.rightEye = 0.5;
+                calibrationCoeffs.rightEye.value = 0.5;
             else
-                calibrationCoeffs.rightEye = 0.9;
+                calibrationCoeffs.rightEye.value = 0.9;
             end
         end
     else
-        calibrationCoeffs.rightEye = mean(abs(rightCoeffs));
+        calibrationCoeffs.rightEye.value = mean(abs(rightCoeffs));
+        calibrationCoeffs.rightEye.isValid = true;
     end
 
+    calibrationCoeffs.leftEye.isValid = false;
     if mean(abs(leftCoeffs)) < 0.5 || mean(abs(leftCoeffs)) > 0.9
         warning('Left eye out of bounds')
         if mean(abs(rightCoeffs)) > 0.5 && mean(abs(rightCoeffs)) < 0.9
-            calibrationCoeffs.leftEye = mean(abs(rightCoeffs));
+            calibrationCoeffs.leftEye.value = mean(abs(rightCoeffs));
         else
             if mean(abs(rightCoeffs)) < 0.5
-                calibrationCoeffs.leftEye = 0.5;
+                calibrationCoeffs.leftEye.value = 0.5;
             else
-                calibrationCoeffs.leftEye = 0.9;
+                calibrationCoeffs.leftEye.value = 0.9;
             end
         end
     else
-        calibrationCoeffs.leftEye = mean(abs(leftCoeffs));
+        calibrationCoeffs.leftEye.value = mean(abs(leftCoeffs));
+        calibrationCoeffs.leftEye.isValid = true;
     end
 
-    offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered, offsets, fileNum);
+    offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered, offsets);
+    calibrationCoeffs.rightEye.offset = mean(offsets(4, 1:3));
+    calibrationCoeffs.leftEye.offset = mean(offsets(4, 4:6));
 
     plotRawVSFiltered_cal(calibrationDataRaw, calibrationDataFiltered)
 

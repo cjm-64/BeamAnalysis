@@ -1,4 +1,4 @@
-function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
+function [testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
     
     set(0, 'units', 'pixels')
     screenSizePixel = get(0,'screensize');
@@ -12,21 +12,21 @@ function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testData
     while ishandle(1)
         clf
         testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
-        testDataFiltered = filterBEAMData(testDataCalibrated); 
-        [testDataDetrended, xLines] = manualCenteringBEAM(detrendBEAMData(testDataFiltered), xLines);
-    
-        calibrationCoeffs
+        [testDataFiltered, xLines] = manualCenteringBEAM(filterBEAMData(testDataCalibrated), xLines, calibrationCoeffs);
+
+        calibrationCoeffs.rightEye.value
+        calibrationCoeffs.leftEye.value
     
         subplot(2,1,1)
-        plot(abs(testDataDetrended.rightEye.X), 'r')
+        plot(abs(testDataFiltered.rightEye.X), 'r')
         hold on
-        plot(abs(testDataDetrended.leftEye.X), 'g')
+        plot(abs(testDataFiltered.leftEye.X), 'g')
         yline(0,'k')
         legend('Right', 'Left')
         hold off
         
         subplot(2, 1, 2)
-        plot(abs(testDataDetrended.rightEye.X) - abs(testDataDetrended.leftEye.X))
+        plot(abs(testDataFiltered.rightEye.X) - abs(testDataFiltered.leftEye.X))
         yline(10, '--r')
         yline(-10, '--r')
         yline(0, 'k')
@@ -46,3 +46,4 @@ function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testData
     end
 end
 
+%         [testDataDetrended, xLines] = manualCenteringBEAM(detrendBEAMData(testDataFiltered), xLines);
