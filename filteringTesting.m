@@ -133,8 +133,27 @@ plot(time,filtered, 'b')
 plot(time, testDataFiltered.rightEye.X)
 legend('raw', 'newFilt', 'oldFilt')
 
+%% 011 testing
 
+rawRight = testDataRaw.rightEye.X;
+rawLeft = testDataRaw.leftEye.X;
+fs = 124;
+[b, a] = butter(4, 5/ceil(fs/2), "low");
+filteredRight = filtfilt(b, a, rawRight);
+filteredLeft = filtfilt(b, a, rawLeft);
+filteredRight = movmedian(filteredRight, 5*fs, 1,'Endpoints', 'shrink');
+filteredLeft = movmedian(filteredLeft, 5*fs, 1,'Endpoints', 'shrink');
 
+figure()
+plot(testDataFinal.time, filteredRight, 'r')
+hold on
+plot(testDataFinal.time, filteredLeft, 'b')
+legend('Right', 'Left')
+xlabel('Time (s)')
+ylabel('<- Eye is moving right      Pixel Position      Eye is moving left ->')
+title('Filtered Raw Data - No Calibration or Centering')
+
+%% Functions
 function returnPoint = medianReplace(segment)
     dataPoint = segment(round(length(segment)/2));
     
@@ -145,7 +164,6 @@ function returnPoint = medianReplace(segment)
         returnPoint = dataPoint;
     end
 end
-
 
 
 

@@ -11,6 +11,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Right Cal Fifteen Right Eye')
     
     subplot(6, 3, 8)
     plot(calibrationDataRaw.leftCal.fifteenPD.rightEye.X, 'r')
@@ -19,6 +20,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Left Cal Fifteen Right Eye')
     
     subplot(6, 3, 9)
     plot(calibrationDataRaw.leftCal.fifteenPD.rightEye.X - calibrationDataRaw.rightCal.fifteenPD.rightEye.X, 'r')
@@ -27,6 +29,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Fifteen Right Eye')
     
     offsets(1,1,fileNum) = mean(calibrationDataFiltered.leftCal.fifteenPD.rightEye.X);
     offsets(2,1,fileNum) = mean(calibrationDataFiltered.rightCal.fifteenPD.rightEye.X);
@@ -42,6 +45,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Right Cal Ten Right Eye')
     
     subplot(6, 3, 5)
     plot(calibrationDataRaw.leftCal.tenPD.rightEye.X, 'r')
@@ -50,6 +54,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Left Cal Ten Right Eye')
     
     subplot(6, 3, 6)
     plot(calibrationDataRaw.leftCal.tenPD.rightEye.X - calibrationDataRaw.rightCal.tenPD.rightEye.X, 'r')
@@ -58,6 +63,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Ten Right Eye')
     
     offsets(1,2,fileNum) = mean(calibrationDataFiltered.leftCal.tenPD.rightEye.X);
     offsets(2,2,fileNum) = mean(calibrationDataFiltered.rightCal.tenPD.rightEye.X);
@@ -71,6 +77,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Right Cal Five Right Eye')
     
     subplot(6, 3, 2)
     plot(calibrationDataRaw.leftCal.fivePD.rightEye.X, 'r')
@@ -79,6 +86,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Left Cal Five Right Eye')
     
     subplot(6, 3, 3)
     plot(calibrationDataRaw.leftCal.fivePD.rightEye.X - calibrationDataRaw.rightCal.fivePD.rightEye.X, 'r')
@@ -87,6 +95,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Five Right Eye')
     
     offsets(1,3,fileNum) = mean(calibrationDataFiltered.leftCal.fivePD.rightEye.X);
     offsets(2,3,fileNum) = mean(calibrationDataFiltered.rightCal.fivePD.rightEye.X);
@@ -100,6 +109,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Right Cal Five Left Eye')
     
     subplot(6, 3, 11)
     plot(calibrationDataRaw.leftCal.fivePD.leftEye.X, 'r')
@@ -108,6 +118,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Left Cal Five Left Eye')
     
     subplot(6, 3, 12)
     plot(calibrationDataRaw.leftCal.fivePD.leftEye.X - calibrationDataRaw.rightCal.fivePD.leftEye.X, 'r')
@@ -116,6 +127,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Five Left Eye')
     
     offsets(1,4,fileNum) = mean(calibrationDataFiltered.leftCal.fivePD.leftEye.X);
     offsets(2,4,fileNum) = mean(calibrationDataFiltered.rightCal.fivePD.leftEye.X);
@@ -130,6 +142,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Right Cal Ten Left Eye')
     
     subplot(6, 3, 14)
     plot(calibrationDataRaw.leftCal.tenPD.leftEye.X, 'r')
@@ -138,6 +151,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Left Cal Ten Left Eye')
     
     subplot(6, 3, 15)
     plot(calibrationDataRaw.leftCal.tenPD.leftEye.X - calibrationDataRaw.rightCal.tenPD.leftEye.X, 'r')
@@ -146,6 +160,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Ten Left Eye')
     
     offsets(1,5,fileNum) = mean(calibrationDataFiltered.leftCal.tenPD.leftEye.X);
     offsets(2,5,fileNum) = mean(calibrationDataFiltered.rightCal.tenPD.leftEye.X);
@@ -159,6 +174,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Right Cal Fifteen Left Eye')
     
     subplot(6, 3, 17)
     plot(calibrationDataRaw.leftCal.fifteenPD.leftEye.X, 'r')
@@ -167,6 +183,7 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Left Cal Fifteen Left Eye')
     
     subplot(6, 3, 18)
     plot(calibrationDataRaw.leftCal.fifteenPD.leftEye.X - calibrationDataRaw.rightCal.fifteenPD.leftEye.X, 'r')
@@ -175,10 +192,14 @@ function offsets = calibrationTests(calibrationDataRaw, calibrationDataFiltered,
     xlabel('Samples')
     ylabel('Pixel')
     legend('raw', 'filtered')
+    title('Fifteen Left Eye')
     
     offsets(1,6,fileNum) = mean(calibrationDataFiltered.leftCal.fifteenPD.leftEye.X);
     offsets(2,6,fileNum) = mean(calibrationDataFiltered.rightCal.fifteenPD.leftEye.X);
     offsets(3,6,fileNum) = offsets(1,6,fileNum) - offsets(2,6,fileNum);
+    offsets(5, :) = mean(offsets(1:2, :), 1);
+    fprintf('Right Eye Center: ~%.0f\n', median(offsets(5, 1:3)));
+    fprintf('Left Eye Center: ~%.0f\n', median(offsets(5, 4:6)));
 end
 
 %%

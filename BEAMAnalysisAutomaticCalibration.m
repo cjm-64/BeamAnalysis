@@ -10,7 +10,7 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     save(strcat('Data/Preprocessed/', fileName, '.mat'), "calibrationDataRaw", "testDataRaw")
     
     %% Get calibration coeffs and save
-    offsets = zeros(4,6);
+    offsets = zeros(5,6);
     [calibrationCoeffs, offsets] = getCalibrationCoeffs(calibrationDataRaw, offsets, 1);
     
     save(strcat('Data/Coefficients/', fileName, '.mat'), "calibrationCoeffs", "offsets")
