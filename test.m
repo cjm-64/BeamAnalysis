@@ -652,10 +652,32 @@ hold on
 plot(downsample(testDataCentered.leftEye.X, 120), 'g')
 
 
+%% Assessing Detrending limits
 
+%% Create everage traces for each group and time point
+clear
 
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 
+testData = cell(size(filePaths, 2), 3);
+% Load Data into Cell Array
+try
+    for cellIndex = 1:size(filePaths,2)
+        testData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).testDataFiltered.rightEye.X;
+        testData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).testDataFiltered.leftEye.X;
+        testData{cellIndex, 3} = load(append(fileRoot, filePaths{cellIndex})).testDataFiltered.time;
+    end
+catch
+    testData{1} = load(filePaths).testDataFinal.X;
+end
 
+rightBetas = cellfun(@(x,y) y\x, testData(:,1), testData(:,3));
+leftBetas = cellfun(@(x,y) y\x, testData(:,2), testData(:,3));
+results = [mean(rightBetas), std(rightBetas) max(rightBetas) min(rightBetas); mean(leftBetas), std(leftBetas) max(leftBetas) min(leftBetas)]
+
+allData = table(filePaths', rightBetas, leftBetas, isoutlier(rightBetas), isoutlier(leftBetas));
+justOutliers = allData(any([allData.Var4(:) == 1 allData.Var5(:) == 1], 2), :);
 
 
 

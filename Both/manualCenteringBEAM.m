@@ -1,5 +1,5 @@
-function [testDataFiltered, xLines] = manualCenteringBEAM(testDataFiltered, xLines, calibrationCoeffs)
-    data = [testDataFiltered.rightEye.X, testDataFiltered.leftEye.X, zeros(size(testDataFiltered.rightEye.X, 1), 1)];
+function [testDataDetrended, xLines] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs)
+    data = [testDataDetrended.rightEye.X, testDataDetrended.leftEye.X, zeros(size(testDataDetrended.rightEye.X, 1), 1)];
     
 
     if ~ishandle(1)
@@ -52,8 +52,7 @@ function [testDataFiltered, xLines] = manualCenteringBEAM(testDataFiltered, xLin
         end    
     end
     
-    testDataFiltered.rightEye.X = data(:,1);
-    testDataFiltered.leftEye.X = data(:,2);
-%     close(1)
+    testDataDetrended.rightEye.X = data(:,1);
+    testDataDetrended.leftEye.X = data(:,2);
 end
 

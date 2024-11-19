@@ -1,4 +1,4 @@
-function [testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
+function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
     
     set(0, 'units', 'pixels')
     screenSizePixel = get(0,'screensize');
@@ -11,22 +11,25 @@ function [testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataC
 
     while ishandle(1)
         clf
-        testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
-        [testDataFiltered, xLines] = manualCenteringBEAM(filterBEAMData(testDataCalibrated), xLines, calibrationCoeffs);
+%         testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
+%         testDataFiltered = filterBEAMData(testDataCalibrated);
+%         testDataDetrended = detrendBEAMData(testDataFiltered);
+        [testDataDetrended, xLines] = manualCenteringBEAM(detrendBEAMData(filterBEAMData(calibrateBEAMData(testDataCentered, calibrationCoeffs))), xLines, calibrationCoeffs);
+%         [testDataDetrended, xLines] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs);
 
         calibrationCoeffs.rightEye.value
         calibrationCoeffs.leftEye.value
     
         subplot(2,1,1)
-        plot(abs(testDataFiltered.rightEye.X), 'r')
+        plot(abs(testDataDetrended.rightEye.X), 'r')
         hold on
-        plot(abs(testDataFiltered.leftEye.X), 'g')
+        plot(abs(testDataDetrended.leftEye.X), 'g')
         yline(0,'k')
         legend('Right', 'Left')
         hold off
         
         subplot(2, 1, 2)
-        plot(abs(testDataFiltered.rightEye.X) - abs(testDataFiltered.leftEye.X))
+        plot(abs(testDataDetrended.rightEye.X) - abs(testDataDetrended.leftEye.X))
         yline(10, '--r')
         yline(-10, '--r')
         yline(0, 'k')
@@ -34,12 +37,12 @@ function [testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataC
     
         rCoeff = input("Right eye coeff: ");
         if ~isempty(rCoeff)
-            calibrationCoeffs.rightEye = rCoeff;
+            calibrationCoeffs.rightEye.value = rCoeff;
         end
     
         lCoeff = input("Left eye coeff: ");
         if ~isempty(lCoeff)
-            calibrationCoeffs.leftEye = lCoeff;
+            calibrationCoeffs.leftEye.value = lCoeff;
         end
         clear rCoeff lCoeff;
     

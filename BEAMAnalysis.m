@@ -123,7 +123,6 @@ writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Ret
 % Metrics to pull
 % Percentage - Also convert to OCS
 % Mean/Median Deviations 
-%%
 arraySize = flip(size(fileNames));
 name = strings(arraySize);
 timepoint = zeros(arraySize);

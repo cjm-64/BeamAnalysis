@@ -1,12 +1,12 @@
-function testDataFinal = getFinalData(testDataFiltered)
+function testDataFinal = getFinalData(testDataDetrended)
    
-    directions = fieldnames(testDataFiltered.rightEye);
+    directions = fieldnames(testDataDetrended.rightEye);
     for dir = 1:numel(directions)        
         if any(strcmp(directions(dir), ["Radius", "Found"]))
             continue;
         else
             % Subtrat left from right
-            testDataFinal.(directions{dir}) = abs(testDataFiltered.rightEye.(directions{dir})) - abs(testDataFiltered.leftEye.(directions{dir}));
+            testDataFinal.(directions{dir}) = abs(testDataDetrended.rightEye.(directions{dir})) - abs(testDataDetrended.leftEye.(directions{dir}));
 %             testDataFinal.(directions{dir}) = testDataFiltered.rightEye.(directions{dir}) - testDataFiltered.leftEye.(directions{dir});
 
 % 
@@ -19,7 +19,7 @@ function testDataFinal = getFinalData(testDataFiltered)
 %             testDataFinal.(directions{dir}) = testDataFinal.(directions{dir}) - mean(testDataFinal.(directions{dir}));
         end
     end
-    testDataFinal.time = testDataFiltered.time;
-    testDataFinal.fps = round(length(testDataFinal.time)/(max(testDataFiltered.time)));
+    testDataFinal.time = testDataDetrended.time;
+    testDataFinal.fps = round(length(testDataFinal.time)/(max(testDataDetrended.time)));
     
 end
