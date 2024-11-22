@@ -679,13 +679,147 @@ results = [mean(rightBetas), std(rightBetas) max(rightBetas) min(rightBetas); me
 allData = table(filePaths', rightBetas, leftBetas, isoutlier(rightBetas), isoutlier(leftBetas));
 justOutliers = allData(any([allData.Var4(:) == 1 allData.Var5(:) == 1], 2), :);
 
+%% How to detrend only true detrends
+% Example
+figure()
+names = fieldnames(testDataFiltered);
+for name = 1:numel(names)
+    if names(name) == "time"
+        testDataFiltered.time = testDataFiltered.time;
+        continue;
+    elseif names(name) == "fps"
+        continue;
+    else
+        fit = polyfit(testDataFiltered.time, testDataFiltered.(names{name}).X, 1);
+        detrendLine = polyval(fit, testDataFiltered.time);
+        dummy.(names{name}) = testDataFiltered.(names{name}).X - detrendLine;
+    end
+    if name == 1
+        subplot(3, 1, 1)
+        plot(testDataFiltered.time, testDataFiltered.rightEye.X, 'r')
+        hold on
+        plot(testDataFiltered.time, detrend(testDataFiltered.rightEye.X), 'c')
+        plot(testDataFiltered.time, detrendLine, 'g--')
+        plot(testDataFiltered.time, testDataFiltered.rightEye.X - detrendLine, 'm')
+        legend('Raw', 'detrend()', 'Calculated Detrend Line', 'Manual Detrend')
+        title('Right Eye')
+    else
+        subplot(3, 1, 2)
+        plot(testDataFiltered.time, testDataFiltered.leftEye.X, 'r')
+        hold on
+        plot(testDataFiltered.time, detrend(testDataFiltered.leftEye.X), 'c')
+        plot(testDataFiltered.time, detrendLine, 'g--')
+        plot(testDataFiltered.time, testDataFiltered.leftEye.X - detrendLine, 'm')
+        legend('Raw', 'detrend()', 'Calculated Detrend Line', 'Manual Detrend')
+        title('Left Eye')
+    end
+end
+subplot(3,1,3)
+plot(testDataFiltered.time, dummy.rightEye, 'Color', [0.6350 0.0780 0.1840, 0.25])
+hold on
+plot(testDataFiltered.time, dummy.leftEye, 'Color', [0.4660 0.6740 0.1880, 0.25])
+plot(testDataFiltered.time, abs(dummy.rightEye) -  abs(dummy.leftEye), 'Color', [0.9290 0.6940 0.1250, 0.25])
+
+
+%% Pull all data and look at linear fit characteristics
+clear
+
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+fitCoeffs = zeros(size(filePaths, 2), 4);
+
+
+if ~iscell(filePaths)
+    disp(filePaths)
+else
+    for cellIndex = 1:size(filePaths, 2)
+        rightEye = load(append(fileRoot, filePaths{cellIndex})).testDataFiltered.rightEye.X;
+        leftEye = load(append(fileRoot, filePaths{cellIndex})).testDataFiltered.leftEye.X;
+        time = load(append(fileRoot, filePaths{cellIndex})).testDataFiltered.time;
+
+        rightFit = polyfit(time, rightEye, 1);
+        rightLine = polyval(rightFit, time);
+    
+    
+        leftFit = polyfit(time, leftEye, 1);
+        leftLine = polyval(leftFit, time);
+    
+        fitCoeffs(cellIndex,:) = [rightFit, leftFit]
+    
+        h = figure();
+        subplot(3, 1, 1)
+        plot(time, rightEye, 'r')
+        hold on
+        plot(time, rightLine, 'g--')
+        plot(time, rightEye-rightLine, 'b')
+        legend('Raw', 'Detrend Line', 'Detrended')
+        title('Right Eye')
+        
+        subplot(3, 1, 2)
+        plot(time, leftEye, 'r')
+        hold on
+        plot(time, leftLine, 'g--')
+        plot(time, leftEye-leftLine, 'b')
+        legend('Raw', 'Detrend Line', 'Detrended')
+        title('Left Eye')
+    
+        subplot(3, 1, 3)
+        plot(time, abs(rightEye-rightLine) - abs(leftEye-leftLine))
+        title('left-right')
+        uiwait(h)
+        clear rightEye rightFit rightLine leftEye leftFit leftLine time h
+    end
+end
+
+
+output = table(filePaths', fitCoeffs);
 
 
 
+%%
+files = output(any([abs(output.fitCoeffs(:,2))>10 abs(output.fitCoeffs(:,2))>10], 2), :);
+
+for i = 1:size(files,1)
+    rightEye = load(append(fileRoot, files.Var1{i})).testDataFiltered.rightEye.X;
+    leftEye = load(append(fileRoot, files.Var1{i})).testDataFiltered.leftEye.X;
+    time = load(append(fileRoot, files.Var1{i})).testDataFiltered.time;
+
+    rightFit = polyfit(time, rightEye, 1);
+    rightLine = polyval(rightFit, time);
 
 
+    leftFit = polyfit(time, leftEye, 1);
+    leftLine = polyval(leftFit, time);
 
+    h = figure();
+    subplot(3, 1, 1)
+    plot(time, rightEye, 'r')
+    hold on
+    plot(time, rightLine, 'g--')
+    plot(time, rightEye-rightLine, 'b')
+    legend('Raw', 'Detrend Line', 'Detrended')
+    title('Right Eye')
+    
+    subplot(3, 1, 2)
+    plot(time, leftEye, 'r')
+    hold on
+    plot(time, leftLine, 'g--')
+    plot(time, leftEye-leftLine, 'b')
+    legend('Raw', 'Detrend Line', 'Detrended')
+    title('Left Eye')
 
+    subplot(3, 1, 3)
+    plot(time, abs(rightEye-rightLine) - abs(leftEye-leftLine), 'b')
+    yline(10, 'r--')
+    yline(-10, 'r--')
+    yline(0, 'k')
+    title('left-right')
+
+    sgtitle(files.Var1{i},'interpreter', 'none') 
+
+    clear rightEye rightFit rightLine leftEye leftFit leftLine time h
+end
 
 
 

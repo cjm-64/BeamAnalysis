@@ -42,13 +42,14 @@ clear
 % Load Data
 [filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 
+
 % Load Data into Cell Array
 try
     for cellIndex = 1:size(filePaths,2)
         testData{cellIndex, 1} = extractBefore(filePaths{cellIndex}, '.mat');
         testData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).testDataFinal.X;
-        deviationData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).deviations.time;
-        deviationData{cellIndex, 2} = load(append(fileRoot, filePaths{cellIndex})).deviations.percentage;
+        % deviationData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).deviations.time;
+        deviationData{cellIndex, 1} = load(append(fileRoot, filePaths{cellIndex})).deviations.percentage;
     end
 catch
     testData{1} = load(filePaths).testDataFinal.X;
@@ -57,8 +58,8 @@ end
 % Scale time and percentage by weight
 totalNumberSamples = sum(cellfun(@(x) size(x, 2), testData(:,2)));
 weightForEachRecording = num2cell(cellfun(@(x) size(x, 2)/totalNumberSamples, testData(:,2)));
-timeDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
-percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,2), weightForEachRecording);
+% timeDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
+percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
 
 % Organize into test-retest
 participantIDs = strings(size(testData, 1), 1);
@@ -82,7 +83,7 @@ for i = 1:size(testData, 1)
         row = row + 1;
         participantIDs(row) = nameSplit{2};
     end
-    organizedTestData{row, timeCol} = timeDeviationForEachRecording(i,1);
+    % organizedTestData{row, timeCol} = timeDeviationForEachRecording(i,1);
     organizedTestData{row, percentCol} = percentDeviationForEachRecording(i,1);
 end
 

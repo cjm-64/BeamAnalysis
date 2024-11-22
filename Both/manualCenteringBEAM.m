@@ -1,16 +1,19 @@
-function [testDataDetrended, xLines] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs)
+function [testDataDetrended, xLines, calibrationCoeffs] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs)
     data = [testDataDetrended.rightEye.X, testDataDetrended.leftEye.X, zeros(size(testDataDetrended.rightEye.X, 1), 1)];
     
 
     if ~ishandle(1)
         close all
-        centeringFigure = figure("Position",[1722 42 1718 1314]);
+        set(0, 'units', 'pixels')
+        screenSizePixel = get(0,'screensize');
+        centeringFigure = figure("Position",[screenSizePixel(3)/2 + 2 42 ...
+            screenSizePixel(3)/2 - 2 screenSizePixel(4)-126]);
     else
         clf
     end
 
-    while ishandle(1)
-        data(:,3) = abs(data(:,1)) - abs(data(:,2));       
+    while ishandle(1)   
+        data(:,3) = abs(data(:,1)) - abs(data(:,2));    
 
         subplot(3, 1, 1)
         totalPlotData = plot(data(:,3));
@@ -43,10 +46,12 @@ function [testDataDetrended, xLines] = manualCenteringBEAM(testDataDetrended, xL
             else
                 if contains(gca().Title.String, 'Right')
                     xLines(1,:) = setCenterWindowBoundaries(x, xLines(1,:), button);
-                    data(:,1) = data(:,1) - mean(data(round(xLines(1,1)):round(xLines(1,2)),1));
+                    calibrationCoeffs.rightEye.manualOffset = mean(data(round(xLines(1,1)):round(xLines(1,2)),1));
+                    data(:,1) = data(:,1) - calibrationCoeffs.rightEye.manualOffset;
                 else
                     xLines(2,:) = setCenterWindowBoundaries(x, xLines(2,:), button);
-                    data(:,2) = data(:,2) - mean(data(round(xLines(2,1)):round(xLines(2,2)),2));
+                    calibrationCoeffs.leftEye.manualOffset = mean(data(round(xLines(2,1)):round(xLines(2,2)),2));
+                    data(:,2) = data(:,2) - calibrationCoeffs.leftEye.manualOffset;
                 end
             end            
         end    

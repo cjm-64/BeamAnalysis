@@ -14,7 +14,7 @@ function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testData
 %         testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
 %         testDataFiltered = filterBEAMData(testDataCalibrated);
 %         testDataDetrended = detrendBEAMData(testDataFiltered);
-        [testDataDetrended, xLines] = manualCenteringBEAM(detrendBEAMData(filterBEAMData(calibrateBEAMData(testDataCentered, calibrationCoeffs))), xLines, calibrationCoeffs);
+        [testDataDetrended, xLines, calibrationCoeffs] = manualCenteringBEAM(detrendBEAMData(filterBEAMData(calibrateBEAMData(testDataCentered, calibrationCoeffs))), xLines, calibrationCoeffs);
 %         [testDataDetrended, xLines] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs);
 
         calibrationCoeffs.rightEye.value

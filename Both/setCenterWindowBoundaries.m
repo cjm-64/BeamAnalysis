@@ -18,7 +18,7 @@ function startAndEnd = setCenterWindowBoundaries(currentPoint, startAndEnd, mous
                 % Right click - set end point
                 startAndEnd(2) = currentPoint;
             else
-                % Not right of left click, do nothing
+                % Not right or left click, do nothing
             end
         end
     end

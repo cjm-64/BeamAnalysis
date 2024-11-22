@@ -11,17 +11,19 @@ function testDataDetrended = detrendBEAMData(testDataFiltered)
                 if directions(dir) == "Radius" || directions(dir) == "Found"
                     testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
                 else                
-                    beta = testDataFiltered.time\testDataFiltered.(names{name}).(directions{dir})
-                    if abs(beta) > 0.0070
-                        % Detrend is an outlier, don't detrend as it can
-                        % cause issues. Limited was determined
-                        % experimentally by calculating beta of all files
-                        % then looking at mean += 3*stdev
-                        warning(append('testDataFiltered.',names{name},'.',directions{dir},' detrend out of limits, detrend not performed'))
-                        testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
+                    fit = polyfit(testDataFiltered.time, testDataFiltered.(names{name}).(directions{dir}), 1);
+                    if abs(fit(1)) > 0.005
+                        % if slope is high then we need to detrend it
+                        testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);
                     else
-                        detrendLine = beta*testDataFiltered.time;
-                        testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - detrendLine;    
+                        if abs(fit(2)) < 12
+                            % low slope & low intercept means it is flat
+                            % and around 0 and can be detrended
+                            testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);
+                        else
+                            warning(append('testDataFiltered.',names{name},'.',directions{dir},' detrend out of limits, detrend not performed'))
+                            testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
+                        end
                     end
                 end
             end
@@ -29,3 +31,20 @@ function testDataDetrended = detrendBEAMData(testDataFiltered)
     end
     disp("Go detrend")
 end
+
+
+
+
+%% Old method below in case it needs to be referenced
+% beta = testDataFiltered.time\testDataFiltered.(names{name}).(directions{dir})
+% if abs(beta) > 0.0070
+%     % Detrend is an outlier, don't detrend as it can
+%     % cause issues. Limited was determined
+%     % experimentally by calculating beta of all files
+%     % then looking at mean += 3*stdev
+%     warning(append('testDataFiltered.',names{name},'.',directions{dir},' detrend out of limits, detrend not performed'))
+%     testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
+% else
+%     detrendLine = beta*testDataFiltered.time;
+%     testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - detrendLine;    
+% end

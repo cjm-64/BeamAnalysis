@@ -4,7 +4,8 @@ clear all; close all; clc
 makeBEAMDataLocations()
 
 %% Get File Names
-fileNames = uigetfile('Data\Raw\BEAM_DATA\*.csv', "MultiSelect","on");
+% fileNames = uigetfile('Data\Raw\BEAM_DATA\*.csv', "MultiSelect","on");
+fileNames = uigetfile('Data\Raw\TestData\*.csv', "MultiSelect","on");
 
 
 %% Process all files
