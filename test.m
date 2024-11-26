@@ -455,15 +455,23 @@ allStD = mean([allData{:,3}])
 
 
 %% Quick test for increasing threshold
-files = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 
-thresholdAmounts = 1:10;
-deviationPercentages = zeros(length(fileNames)/2, length(thresholdAmounts)*2);
+thresholdAmounts = 1:15;
+deviationPercentages = zeros(size(filePaths, 2)/2, length(thresholdAmounts)*2);
+participantNames = strings(size(filePaths, 2)/2,1);
 
 loc = 1;
-for i = 1:length(fileNames)
-    load(append(filePath,'\', fileNames{i}));
-    disp(fileNames{i})
+for i = 1:length(filePaths)
+    load(append(fileRoot,'\', filePaths{i}));
+    disp(filePaths{i})
+    if ~contains(participantNames(loc), 'BEAM')
+        % Name not written, put it
+        participantNames(loc) = extractBefore(filePaths{i}, 'RETEST');
+    else
+        %Do nothing
+    end
+
     for j = 1:length(thresholdAmounts)
         threshold = thresholdAmounts(j);
         deviations = calculateDeviations(testDataFinal, threshold);
@@ -480,7 +488,7 @@ for i = 1:length(fileNames)
             deviations.meanSize = 0;
             deviations.medianSize = 0;
         end
-        if contains(fileNames{i}, 'RETEST')
+        if contains(filePaths{i}, 'RETEST')
             deviationPercentages(loc, j*2) = deviations.percentage;
         else
             deviationPercentages(loc, (j*2)-1) = deviations.percentage;
@@ -491,12 +499,12 @@ for i = 1:length(fileNames)
     end
 end
 
-outputTable = table(fileNames, deviationPercentages)
+outputTable = table(participantNames, deviationPercentages)
 
-[r, LB, UB, F, df1, df2, p] = ICC(M, type, alpha, r0)
+% [r, LB, UB, F, df1, df2, p] = ICC(M, type, alpha, r0);
 
 resultsICC = zeros(length(thresholdAmounts), 2);
-resultsICC(:,1) = 1:10;
+resultsICC(:,1) = thresholdAmounts;
 for i = 1:size(deviationPercentages, 2)/2
     resultsICC(i,2) = ICC(deviationPercentages(:,(i*2)-1:i*2), '1-1', 0.05);
 end
@@ -820,6 +828,49 @@ for i = 1:size(files,1)
 
     clear rightEye rightFit rightLine leftEye leftFit leftLine time h
 end
+
+%% Trying to better understand ICC values and why they're changing
+% MSW = column
+% MSR = rows
+% load and split data
+load("Test Retest Data 26Nov2024.mat");
+BNC_Percentages = outputTable.deviationPercentages(outputTable.isControl == 1, :);
+IXT_Percentages = outputTable.deviationPercentages(outputTable.isControl == 0, :);
+
+% BNC
+[n, k] = size(BNC_Percentages);
+MSR = var(mean(BNC_Percentages, 2)) * k;
+MSW = sum(var(BNC_Percentages,0, 2)) / n;
+
+r = (MSR - MSW) / (MSR + (k-1)*MSW);
+
+% IXT 
+[n, k] = size(IXT_Percentages);
+MSR = var(mean(IXT_Percentages, 2)) * k;
+MSW = sum(var(IXT_Percentages,0, 2)) / n;
+
+r = (MSR - MSW) / (MSR + (k-1)*MSW);
+
+%Basically because so many are below 0 it means that they are really
+%vulnerable to changes  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

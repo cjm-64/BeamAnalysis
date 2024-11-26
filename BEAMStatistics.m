@@ -56,13 +56,13 @@ catch
 end
 
 % Scale time and percentage by weight
-totalNumberSamples = sum(cellfun(@(x) size(x, 2), testData(:,2)));
-weightForEachRecording = num2cell(cellfun(@(x) size(x, 2)/totalNumberSamples, testData(:,2)));
+totalNumberSamples = sum(cellfun(@(x) size(x, 1), testData(:,2)));
+weightForEachRecording = num2cell(cellfun(@(x) size(x, 1)/totalNumberSamples, testData(:,2)));
 % timeDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
 percentDeviationForEachRecording = cellfun(@(x, y) x.*y, deviationData(:,1), weightForEachRecording);
 
 % Organize into test-retest
-participantIDs = strings(size(testData, 1), 1);
+participantIDs = strings(size(testData, 1)/2, 1);
 organizedTestData = cell(size(testData, 1)/2, 4);
 row = 1;
 nameCol = 1;
@@ -87,7 +87,7 @@ for i = 1:size(testData, 1)
     organizedTestData{row, percentCol} = percentDeviationForEachRecording(i,1);
 end
 
-[r, LB, UB,F, df1, df2, p] = ICC(cell2mat(organizedTestData(:,3:4)), '1-1', 0.05);
+[r, LB, UB,F, df1, df2, p] = ICC(cell2mat(organizedTestData(:,3:4)), '1-1', 0.05)
 
 
 
