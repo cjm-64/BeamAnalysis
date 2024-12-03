@@ -12,19 +12,7 @@ function testDataDetrended = detrendBEAMData(testDataFiltered)
                     testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
                 else                
                     fit = polyfit(testDataFiltered.time, testDataFiltered.(names{name}).(directions{dir}), 1);
-                    if abs(fit(1)) > 0.005
-                        % if slope is high then we need to detrend it
-                        testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);
-                    else
-                        if abs(fit(2)) < 12
-                            % low slope & low intercept means it is flat
-                            % and around 0 and can be detrended
-                            testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);
-                        else
-                            warning(append('testDataFiltered.',names{name},'.',directions{dir},' detrend out of limits, detrend not performed'))
-                            testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
-                        end
-                    end
+                    testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);                    
                 end
             end
         end
@@ -32,6 +20,20 @@ function testDataDetrended = detrendBEAMData(testDataFiltered)
     disp("Go detrend")
 end
 
+%% Logic for detrending only certain traces
+% if abs(fit(1)) > 0.005
+%     % if slope is high then we need to detrend it
+%     testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);
+% else
+%     if abs(fit(2)) < 12
+%         % low slope & low intercept means it is flat
+%         % and around 0 and can be detrended
+%         testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir}) - polyval(fit, testDataFiltered.time);
+%     else
+%         warning(append('testDataFiltered.',names{name},'.',directions{dir},' detrend out of limits, detrend not performed'))
+%         testDataDetrended.(names{name}).(directions{dir}) = testDataFiltered.(names{name}).(directions{dir});
+%     end
+% end
 
 
 

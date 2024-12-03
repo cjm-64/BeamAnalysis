@@ -755,33 +755,49 @@ else
     
         fitCoeffs(cellIndex,:) = [rightFit, leftFit]
     
-        h = figure();
-        subplot(3, 1, 1)
-        plot(time, rightEye, 'r')
-        hold on
-        plot(time, rightLine, 'g--')
-        plot(time, rightEye-rightLine, 'b')
-        legend('Raw', 'Detrend Line', 'Detrended')
-        title('Right Eye')
-        
-        subplot(3, 1, 2)
-        plot(time, leftEye, 'r')
-        hold on
-        plot(time, leftLine, 'g--')
-        plot(time, leftEye-leftLine, 'b')
-        legend('Raw', 'Detrend Line', 'Detrended')
-        title('Left Eye')
-    
-        subplot(3, 1, 3)
-        plot(time, abs(rightEye-rightLine) - abs(leftEye-leftLine))
-        title('left-right')
-        uiwait(h)
+%         h = figure();
+%         subplot(3, 1, 1)
+%         plot(time, rightEye, 'r')
+%         hold on
+%         plot(time, rightLine, 'g--')
+%         plot(time, rightEye-rightLine, 'b')
+%         legend('Raw', 'Detrend Line', 'Detrended')
+%         title('Right Eye')
+%         
+%         subplot(3, 1, 2)
+%         plot(time, leftEye, 'r')
+%         hold on
+%         plot(time, leftLine, 'g--')
+%         plot(time, leftEye-leftLine, 'b')
+%         legend('Raw', 'Detrend Line', 'Detrended')
+%         title('Left Eye')
+%     
+%         subplot(3, 1, 3)
+%         plot(time, abs(rightEye-rightLine) - abs(leftEye-leftLine))
+%         title('left-right')
+%         uiwait(h)
         clear rightEye rightFit rightLine leftEye leftFit leftLine time h
     end
 end
 
 
-output = table(filePaths', fitCoeffs);
+
+isDetrended = zeros(size(fitCoeffs, 1), 2);
+for i = 1:size(fitCoeffs, 1)
+    for j = 1:2
+        if abs(fitCoeffs(i, (2*j)-1)) > 0.005
+            isDetrended(i,j) = 1;
+        else 
+            if abs(fitCoeffs(i, (2*j))) < 12
+                isDetrended(i,j) = 1;
+            else
+                isDetrended(i,j) = 0;
+            end
+        end
+    end
+end
+output = table(filePaths', fitCoeffs(:, 1:2), isDetrended(:,1),  fitCoeffs(:, 3:4), isDetrended(:,2));
+justOutliers = output(any([output.Var3(:) == 0 output.Var5(:) == 0], 2), :);
 
 
 
@@ -833,7 +849,7 @@ end
 % MSW = column
 % MSR = rows
 % load and split data
-load("Test Retest Data 26Nov2024.mat");
+load("Test Retest Data 03Dec2024.mat");
 BNC_Percentages = outputTable.deviationPercentages(outputTable.isControl == 1, :);
 IXT_Percentages = outputTable.deviationPercentages(outputTable.isControl == 0, :);
 
@@ -841,6 +857,13 @@ IXT_Percentages = outputTable.deviationPercentages(outputTable.isControl == 0, :
 [n, k] = size(BNC_Percentages);
 MSR = var(mean(BNC_Percentages, 2)) * k;
 MSW = sum(var(BNC_Percentages,0, 2)) / n;
+
+r = (MSR - MSW) / (MSR + (k-1)*MSW);
+
+% BNC
+[n, k] = size(BNCsubtractedFrom100);
+MSR = var(mean(BNCsubtractedFrom100, 2)) * k;
+MSW = sum(var(BNCsubtractedFrom100,0, 2)) / n;
 
 r = (MSR - MSW) / (MSR + (k-1)*MSW);
 
@@ -854,15 +877,74 @@ r = (MSR - MSW) / (MSR + (k-1)*MSW);
 %Basically because so many are below 0 it means that they are really
 %vulnerable to changes  
 
+%% Adjust diff cutoff
+
+rawData = testDataCalibrated.rightEye.X;
+radius = testDataCalibrated.rightEye.Radius;
+found = testDataCalibrated.rightEye.Found;
+time = testDataCalibrated.time;
+
+% rawData = testDataCalibrated.leftEye.X;
+% radius = testDataCalibrated.leftEye.Radius;
+% found = testDataCalibrated.leftEye.Found;
+% time = testDataCalibrated.time;
+
+figure()
+subplot(2, 2, 1)
+title('Calibrated')
+plot(time, rawData)
 
 
+subplot(2, 2, 2)
+title('Diff')
+plot(abs([0; diff(rawData)]))
+yline(15)
+
+% Find Outliers, where rawData >45, radius not found, or eye not found
+uf = (radius==0 | ~found | abs([0; diff(rawData)])>15);
+uf = logical(uf);
+
+dummy = rawData;
+dummy(uf) = NaN;
+fs = testDataCalibrated.fps;
+seconds = 5;
+if isempty(uf)
+        % Do nothing
+elseif uf(1) == 1
+    dummy(1) = median(dummy, 'omitnan');
+end
+dummy = fillmissing(dummy, 'movmedian', seconds*fs);
 
 
+subplot(2, 2, 3)
+title('After diff')
+plot(dummy)
+
+ % Low Pass Filter, cutoff of 5 Hz
+[b, a] = butter(4, 5/ceil(fs/2), "low");
+dummy = filtfilt(b, a, dummy);
+
+% Moving median to smooth signal, windowsize based on seconds of data
+dummy = movmedian(dummy, seconds*fs, 1,'Endpoints', 'shrink');
+
+subplot(2, 2, 4)
+title('fully filtered')
+plot(dummy)
 
 
+%% Find shortest file
 
+sourceDirectory = uigetdir('Data\');
+fileList = dir(sourceDirectory);
+splitFileNames = split(cellfun(@string, {fileList(3:end).name}'), "_");
 
+times = zeros(length(fileList)-2, 1);
+for i = 3:length(fileList)
+    times(i-2) = max(load(append(fileList(i).folder, '\', fileList(i).name)).testDataFinal.time);
+end
+min(times)
 
+%% Clip to this
 
 
 
