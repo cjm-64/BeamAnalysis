@@ -933,21 +933,72 @@ plot(dummy)
 
 
 %% Find shortest file
+clear
 
-sourceDirectory = uigetdir('Data\');
-fileList = dir(sourceDirectory);
-splitFileNames = split(cellfun(@string, {fileList(3:end).name}'), "_");
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 
-times = zeros(length(fileList)-2, 1);
-for i = 3:length(fileList)
-    times(i-2) = max(load(append(fileList(i).folder, '\', fileList(i).name)).testDataFinal.time);
+
+times = zeros(length(filePaths), 2);
+for i = 1:length(filePaths)
+    data = load(append(fileRoot, filePaths{i})).testDataFinal;
+    times(i, 1) = max(data.time);
+    times(i, 2) = size(data.time, 1);
 end
 min(times)
 
 %% Clip to this
 
+testData = cell(size(filePaths, 2)/2, 2);
+row = 1;
 
+for i = 1:length(filePaths)
+    filePaths{i}
+    data = load(append(fileRoot, filePaths{i})).testDataFinal;
+    fps = data.fps;
 
+    if max(data.time) > 5400
+        alignment = data.X(1:data.fps*1800);
+    else
+        alignment = data.X;
+    end
+
+    if contains(filePaths{i}, 'RETEST')
+        col = 2;
+    else 
+        col = 1;
+    end
+
+    testData{row, col} = alignment;
+    if mod(i, 2) == 0
+        row = row + 1;
+    end
+end
+
+choppedDeviations = cellfun(@(x) getDeviations(x, 10, 124), testData, 'UniformOutput', false);
+
+%%
+devTime = zeros(size(choppedDeviations));
+for i = 1:size(choppedDeviations, 1)
+    for j = 1:size(choppedDeviations, 2)
+        if isnan(choppedDeviations{i, j}(1))
+            devTime(i,j) = 0;
+        else
+            devTime(i,j) = (choppedDeviations{i, j}(2)-choppedDeviations{i, j}(1))/1800;
+        end
+    end
+end
+
+[r, ~,~,~,~,~, p] = ICC(devTime, '1-1', 0.05)
+
+dt1 = (zeros(size(devTime))+100) - devTime;
+% IXT 
+[n, k] = size(devTime);
+MSR = var(mean(devTime, 2)) * k;
+MSW = sum(var(devTime,0, 2)) / n;
+
+r = (MSR - MSW) / (MSR + (k-1)*MSW);
+%% 
 
 
 

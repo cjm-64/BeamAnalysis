@@ -87,7 +87,7 @@ for i = 1:size(testData, 1)
     organizedTestData{row, percentCol} = percentDeviationForEachRecording(i,1);
 end
 
-[r, LB, UB,F, df1, df2, p] = ICC(cell2mat(organizedTestData(:,3:4)), '1-1', 0.05)
+[r, ~,~,~,~,~, p] = ICC(cell2mat(organizedTestData(:,3:4)), '1-1', 0.05)
 
 
 
