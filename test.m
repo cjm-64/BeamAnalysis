@@ -998,7 +998,81 @@ MSR = var(mean(devTime, 2)) * k;
 MSW = sum(var(devTime,0, 2)) / n;
 
 r = (MSR - MSW) / (MSR + (k-1)*MSW);
-%% 
+%% Pull files to compare mean and StD
+
+clear
+
+
+sourceDirectory = uigetdir('Data\');
+fileList = dir(sourceDirectory);
+fileList = fileList(3:end);
+splitFileNames = split(cellfun(@string, {fileList.name}'), "_");
+
+longitudinalParticipants = strings(2, 1);
+partLoc = 1;
+inRange = 1;
+i = 1;
+while inRange == 1
+    if i > size(splitFileNames, 1)
+        inRange = 0;
+        break;
+    end
+
+    if sum(strcmp(splitFileNames(i,2), splitFileNames(:,2))) > 1
+        % This participant has both files
+        longitudinalParticipants(partLoc, 1) = splitFileNames(i, 2);
+        partLoc = partLoc + 1;
+        i = i + 2;
+    else
+        % This participant has one file - do nothing
+        i = i + 1;
+    end
+end
+
+% Update when new data acquired
+isControl = [ones(16,1); zeros(3, 1); ones(3, 1); zeros(8, 1); ones(2, 1)];
+
+testData = cell(size(longitudinalParticipants, 1), 4);
+col = 1;
+row = 1;
+for cellIndex = 1:size(fileList,1)
+    if contains(fileList(cellIndex).name, 'NJIT011')
+        continue;
+    end
+    fileList(cellIndex).name
+    if contains(fileList(cellIndex).name, 'RETEST')
+        col = 3;
+    else
+        col = 2;
+    end
+    testData{row, col} = load(append(fileList(cellIndex).folder, '\', fileList(cellIndex).name)).testDataFinal.X;
+    if col == 2
+        testData{row, 1} = longitudinalParticipants(row);
+        testData{row, 4} = isControl(row);
+        row = row + 1;
+    end
+end
+
+Means = cellfun(@mean, testData(:, 2:3));
+StDevs = cellfun(@std, testData(:, 2:3));
+BNC_Means = Means(isControl == 1, :);
+BNC_StDevs = StDevs(isControl == 1, :);
+IXT_Means = Means(isControl == 0, :);
+IXT_StDevs = StDevs(isControl == 0, :);
+
+
+% [r,~,~,~,~,~,p] = ICC(BNC_StDevs, '1-1', 0.05)
+
+ICC(BNC_Means, '1-1', 0.05)
+ICC(BNC_StDevs, '1-1', 0.05)
+ICC(IXT_Means, '1-1', 0.05)
+ICC(IXT_StDevs, '1-1', 0.05)
+
+mean(abs(BNC_Means(:,1)-BNC_Means(:,2)))
+mean(abs(BNC_StDevs(:,1)-BNC_StDevs(:,2)))
+mean(abs(IXT_Means(:,1)-IXT_Means(:,2)))
+mean(abs(IXT_StDevs(:,1)-IXT_StDevs(:,2)))
+
 
 
 
