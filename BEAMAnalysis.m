@@ -160,7 +160,7 @@ for i = 1:length(fileNames)
 end
 
 outputTable = table(fileNames', timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
-writetable(outputTable, append(extractBefore(filePath, 'Data'), 'BEAM ARVO Export ', char(datetime("today")), '.csv'))
+% writetable(outputTable, append(extractBefore(filePath, 'Data'), 'BEAM ARVO Export ', char(datetime("today")), '.csv'))
 
 
 

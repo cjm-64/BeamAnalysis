@@ -1,10 +1,10 @@
 clear all; close all; clc
 
 %% Load Data
-
-opts = detectImportOptions('C:\Users\VNEL\Dropbox\BEAM\Conferences\ARVO 2025\BEAM ARVO Export 04-Dec-2024.csv');
+[fileName, filePath] = uigetfile('Data\*.csv');
+opts = detectImportOptions(append(filePath, fileName));
 opts = setvaropts(opts, 4, "FillValue", 2);
-data = readtable('C:\Users\VNEL\Dropbox\BEAM\Conferences\ARVO 2025\BEAM ARVO Export 04-Dec-2024.csv', opts);
+data = readtable(append(filePath, fileName), opts);
 
 %% Scatter of BEAM vs Mean Distance Control Score
 x = data.MeanDistanceControl;
@@ -39,8 +39,11 @@ splitNames = split(data.Var1, '_');
 justNames = splitNames(:,2);
 participantIDs = cellfun(@(x) extractAfter(x, 'LUS'), justNames, 'UniformOutput', false);
 
-ARVODataFinal = table(participantIDs, data.timepoint, data.percentages, data.BEAMofficeControlScore, data.DistanceControlBeforeBEAM1, data.DistanceControlBeforeBEAM2, data.DistanceControlAfterBEAM, data.MeanDistanceControlBeforeBEAM, data.MeanDistanceControl);
-outputVariableNames = {'ID', 'Timepoint', 'Percent Deviated', 'BEAM_OCS', 'OCS_Distance_1', 'OCS_Distance_2', 'OCS_Distance_3', 'Mean_OCS_Before_BEAM', 'Mean_OCS_Total'};
+visitNum = strings(22, 1);
+visitNum(1:2:22) = "Visit 2";
+visitNum(2:2:22) = "Visit 1";
+ARVODataFinal = table(visitNum, data.percentages, data.BEAMofficeControlScore, data.MeanDistanceControl);
+outputVariableNames = {'Visit_Num', 'Percent_Deviated', 'BEAM_OCS', 'Mean_OCS_Total'};
 ARVODataFinal.Properties.VariableNames = outputVariableNames;
 
 %% Create figures
@@ -71,6 +74,24 @@ for i = 1:size(fileList, 1)
     title(figTitle)
 end
 sgtitle('Variaiblity in IXT patient Recordings')
+
+%% Group by control score
+
+
+BEAM_OCS_2 = ARVODataFinal(round(ARVODataFinal.Mean_OCS_Total) == 2, :);
+BEAM_OCS_3 = ARVODataFinal(round(ARVODataFinal.Mean_OCS_Total) == 3, :);
+BEAM_OCS_4 = ARVODataFinal(round(ARVODataFinal.Mean_OCS_Total) == 4, :);
+
+groupedPercentDeviated = [mean(BEAM_OCS_2.Percent_Deviated) std(BEAM_OCS_2.Percent_Deviated);
+    mean(BEAM_OCS_3.Percent_Deviated) std(BEAM_OCS_3.Percent_Deviated);
+    mean(BEAM_OCS_4.Percent_Deviated) std(BEAM_OCS_4.Percent_Deviated)];
+
+%% 
+
+sum(data.BEAMofficeControlScore == round(data.MeanDistanceControl))/22
+
+
+
 
 
 
