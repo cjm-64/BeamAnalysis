@@ -653,6 +653,12 @@ ylabel('<-OS Trope   Deviation(PD)   OD Trope->')
 figTitle = input('Input title of figure: ', 's');
 title(figTitle)
 
+figure()
+lineOut = stdshade(dummy', 0.25, 'b', linspace(0, 90, size(dummy, 1)), 2);
+lineOut.Parent.XLabel.String = 'time (min)';
+lineOut.Parent.YLabel.String = 'eye alignment (PD)';
+lineOut.Parent
+
 %% 
 
 plot(downsample(testDataCentered.rightEye.X, 120), 'r')
