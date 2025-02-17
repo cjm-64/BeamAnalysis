@@ -1168,9 +1168,9 @@ for i = 1:length(filePaths)
     allData{row, 3, page} = load(append(fileRoot, filePaths{i})).testDataFinal.fps;
 end
 
-testDevs = cellfun(@(x,y) getDeviations(x, 10, y)', allData(:,2), allData(:,3), 'UniformOutput', false);
-retestDevs = cellfun(@(x,y) getDeviations(x, 10, y)', allData(:,5), allData(:,6), 'UniformOutput', false);
-
-
-
+%%
+for i = 1:2
+    allData(:, 4, i) = cellfun(@(x,y) getDeviations(x, 10, y)', allData(:, 2, i), allData(:, 3, i), 'UniformOutput', false);
+    allData(:, 5, i) = cellfun(@(x,y) getDeviationLengths(x,y), allData(:, 4, i), allData(:, 3, i), 'UniformOutput', false);
+end
 
