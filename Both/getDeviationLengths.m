@@ -5,5 +5,6 @@ function deviationLengths = getDeviationLengths(deviations, fps)
     end
     deviationLengths(deviationLengths(:,1) == 0) = 1;
     deviationLengths(:, 2) = deviationLengths(:,1)*(1/fps);
+    deviationLengths(deviationLengths(:,2)<5, :) = [];
 end
 

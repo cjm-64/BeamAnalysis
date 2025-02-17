@@ -889,6 +889,7 @@ rawData = testDataCalibrated.rightEye.X;
 radius = testDataCalibrated.rightEye.Radius;
 found = testDataCalibrated.rightEye.Found;
 time = testDataCalibrated.time;
+cutoff = 1;
 
 % rawData = testDataCalibrated.leftEye.X;
 % radius = testDataCalibrated.leftEye.Radius;
@@ -897,17 +898,17 @@ time = testDataCalibrated.time;
 
 figure()
 subplot(2, 2, 1)
-title('Calibrated')
 plot(time, rawData)
+title('Calibrated')
 
 
 subplot(2, 2, 2)
-title('Diff')
 plot(abs([0; diff(rawData)]))
-yline(15)
+yline(cutoff)
+title('Diff')
 
 % Find Outliers, where rawData >45, radius not found, or eye not found
-uf = (radius==0 | ~found | abs([0; diff(rawData)])>15);
+uf = (radius==0 | ~found | abs([0; diff(rawData)])>cutoff);
 uf = logical(uf);
 
 dummy = rawData;
@@ -923,8 +924,8 @@ dummy = fillmissing(dummy, 'movmedian', seconds*fs);
 
 
 subplot(2, 2, 3)
-title('After diff')
 plot(dummy)
+title('After diff')
 
  % Low Pass Filter, cutoff of 5 Hz
 [b, a] = butter(4, 5/ceil(fs/2), "low");
@@ -934,8 +935,8 @@ dummy = filtfilt(b, a, dummy);
 dummy = movmedian(dummy, seconds*fs, 1,'Endpoints', 'shrink');
 
 subplot(2, 2, 4)
-title('fully filtered')
 plot(dummy)
+title('fully filtered')
 
 
 %% Find shortest file
@@ -970,12 +971,12 @@ for i = 1:length(filePaths)
     end
 
     if contains(filePaths{i}, 'RETEST')
-        col = 2;
+        page = 2;
     else 
-        col = 1;
+        page = 1;
     end
 
-    testData{row, col} = alignment;
+    testData{row, page} = alignment;
     if mod(i, 2) == 0
         row = row + 1;
     end
@@ -1039,7 +1040,7 @@ end
 isControl = [ones(16,1); zeros(3, 1); ones(3, 1); zeros(8, 1); ones(2, 1)];
 
 testData = cell(size(longitudinalParticipants, 1), 4);
-col = 1;
+page = 1;
 row = 1;
 for cellIndex = 1:size(fileList,1)
     if contains(fileList(cellIndex).name, 'NJIT011')
@@ -1047,12 +1048,12 @@ for cellIndex = 1:size(fileList,1)
     end
     fileList(cellIndex).name
     if contains(fileList(cellIndex).name, 'RETEST')
-        col = 3;
+        page = 3;
     else
-        col = 2;
+        page = 2;
     end
-    testData{row, col} = load(append(fileList(cellIndex).folder, '\', fileList(cellIndex).name)).testDataFinal.X;
-    if col == 2
+    testData{row, page} = load(append(fileList(cellIndex).folder, '\', fileList(cellIndex).name)).testDataFinal.X;
+    if page == 2
         testData{row, 1} = longitudinalParticipants(row);
         testData{row, 4} = isControl(row);
         row = row + 1;
@@ -1079,13 +1080,96 @@ mean(abs(BNC_StDevs(:,1)-BNC_StDevs(:,2)))
 mean(abs(IXT_Means(:,1)-IXT_Means(:,2)))
 mean(abs(IXT_StDevs(:,1)-IXT_StDevs(:,2)))
 
+%% Test Threshold Levels
 
+clear
 
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+allData = cell(ceil(length(filePaths)/2), 5);
+row = 0;
 
+for i = 1:length(filePaths)
+    splitNames = split(filePaths{i}, '_');
 
+    if i == 1 || ~contains([allData{:,1}], splitNames{2})
+        row = row + 1;
+        allData{row, 1} = splitNames{2};
+    else
+        % row remains the same
+    end
+    if contains(filePaths{i}, 'RETEST')
+        page = 4;
+    else
+        page = 2;
+    end
+    allData{row, page} = load(append(fileRoot, filePaths{i})).testDataFinal.X;
+    allData{row, page+1} = load(append(fileRoot, filePaths{i})).testDataFinal.fps;
+end
 
+% Test different thresholds
 
+for i = 1:10
+    choppedDeviations(:,:,i) = cellfun(@(x) getDeviations(x, i, 124), allData(:,2:3), 'UniformOutput', false);
+end
 
+%% Get average FPS
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+allFPS = nan(length(filePaths), 1);
+for i = 1:length(filePaths)
+    allFPS(i) = load(append(fileRoot, filePaths{i})).testDataFinal.fps;
+end
+
+avgFPS = mean(allFPS);
+stdFPS = std(allFPS);
+
+histogram(allFPS)
+sum(isoutlier(allFPS))
+
+%% Create list of controls and patients
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+names = strings(length(filePaths), 1);
+for i = 1:length(filePaths)
+    splitName = split(load(append(fileRoot, filePaths{i})).fileName, '_');
+    names(i) = splitName{2};
+end
+participantName = unique(names);
+isControl = [ones(8,1); 0; ones(8,1); zeros(3,1); ones(3,1); zeros(8,1); [1;1;0;1]];
+isControlList = table(participantName, isControl);
+
+%% Test detection of deviation lengths
+
+clear
+
+% Load Data - Only IXT or BNC, not both at same time
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+allData = cell(ceil(length(filePaths)/2), 7, 2);
+row = 0;
+page = 1;
+testRowNum = 0;
+retestRowNum = 0;
+
+for i = 1:length(filePaths)
+    splitNames = split(filePaths{i}, '_');
+
+    if contains(filePaths{i}, 'RETEST')
+        page = 2;
+        retestRowNum = retestRowNum + 1;
+        row = retestRowNum;
+    else
+        page = 1;
+        testRowNum = testRowNum + 1;
+        row = testRowNum;
+    end
+    allData{row, 1, page} = splitNames{2};
+    allData{row, 2, page} = load(append(fileRoot, filePaths{i})).testDataFinal.X;
+    allData{row, 3, page} = load(append(fileRoot, filePaths{i})).testDataFinal.fps;
+end
+
+testDevs = cellfun(@(x,y) getDeviations(x, 10, y)', allData(:,2), allData(:,3), 'UniformOutput', false);
+retestDevs = cellfun(@(x,y) getDeviations(x, 10, y)', allData(:,5), allData(:,6), 'UniformOutput', false);
 
 
 

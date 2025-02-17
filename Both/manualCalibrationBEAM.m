@@ -1,4 +1,4 @@
-function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
+function [testDataCalibrated, testDataDetrended,testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs)
     
     set(0, 'units', 'pixels')
     screenSizePixel = get(0,'screensize');
@@ -11,10 +11,14 @@ function [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testData
 
     while ishandle(1)
         clf
+        testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
+        testDataDetrended = detrendBEAMData(testDataCalibrated);
+        testDataFiltered = filterBEAMData(testDataDetrended);
+        [testDataDetrended, xLines, calibrationCoeffs] = manualCenteringBEAM(testDataFiltered, xLines, calibrationCoeffs);
 %         testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
 %         testDataFiltered = filterBEAMData(testDataCalibrated);
 %         testDataDetrended = detrendBEAMData(testDataFiltered);
-        [testDataDetrended, xLines, calibrationCoeffs] = manualCenteringBEAM(detrendBEAMData(filterBEAMData(calibrateBEAMData(testDataCentered, calibrationCoeffs))), xLines, calibrationCoeffs);
+%         [testDataDetrended, xLines, calibrationCoeffs] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs);
 %         [testDataDetrended, xLines] = manualCenteringBEAM(testDataDetrended, xLines, calibrationCoeffs);
 
         calibrationCoeffs.rightEye.value

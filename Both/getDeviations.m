@@ -15,6 +15,7 @@ function deviations = getDeviations(data, threshold, fps)
                     deviationCount = deviationCount + 1;
                     isDeviated = false;
                     if (deviations(2, deviationCount-1) - deviations(1, deviationCount-1) < frames2sec)
+                        % Is the deviation < 10 seconds
                         deviationCount = deviationCount - 1;
                         deviations(:, deviationCount) = NaN;
                     end
@@ -22,10 +23,9 @@ function deviations = getDeviations(data, threshold, fps)
             % First instance of deviation (start)
             else
                 % Start/End case where only 1 frame is deviated
-                if i == size(data, 1) || ~(data(i+1) > threshold)                    
-                    deviations(1, deviationCount) = i;
-                    deviations(2, deviationCount) = i+1;
-                    deviationCount = deviationCount + 1;
+                % Do not include deviation
+                if i == size(data, 1) || ~(data(i+1) > threshold)
+                    isDeviated = false;                
                 % Start case
                 else
                     deviations(1, deviationCount) = i;

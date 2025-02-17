@@ -1,7 +1,8 @@
 function filteredData = filterBEAMTestData(rawData, radius, found, fs, seconds)
     
     % Find Outliers, where rawData >45, radius not found, or eye not found
-    uf = (radius==0 | ~found | abs([0; diff(rawData)])>15);
+%     uf = (radius==0 | ~found | abs([0; diff(rawData)])>15);
+    uf = (abs(rawData) > 60 | radius==0 | ~found | abs([0; diff([0; diff(rawData)])])>5);
     uf = logical(uf);
     
     % Replace Outliers with previous 

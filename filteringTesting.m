@@ -153,7 +153,192 @@ xlabel('Time (s)')
 ylabel('<- Eye is moving right      Pixel Position      Eye is moving left ->')
 title('Filtered Raw Data - No Calibration or Centering')
 
+%% Detrend before filtering
+rawData = [testDataCalibrated.rightEye.X testDataCalibrated.leftEye.X];
+time = testDataCalibrated.time;
+
+pFitR = polyfit(time, rawData(:,1),1);
+pFitL = polyfit(time, rawData(:,2),1);
+pValR = polyval(pFitR, time);
+pValL = polyval(pFitL, time);
+
+figure()
+subplot(4, 2, 1)
+plot(time, rawData(:,1), 'b')
+subplot(4, 2, 3)
+plot(time, pValR, 'r')
+subplot(4, 2, 5)
+plot(time, rawData(:,1)-pValR,'m')
+
+subplot(4, 2, 2)
+plot(time, rawData(:,2), 'b')
+subplot(4, 2, 4)
+plot(time, pValL, 'r')
+subplot(4, 2, 6)
+plot(time, rawData(:,2)-pValL,'m')
+
+subplot(4, 2, 7:8)
+plot(time, abs() - abs(rawData(:,2)-pValL))
+%% Double derivative, to get acceleration
+
+detrendedRawData = [rawData(:,1)-pValR, rawData(:,2)-pValL];
+velocity = [[0 0]; diff(detrendedRawData, 1, 1)];
+acceleration = [[0 0]; diff(velocity)];
+
+% Find Outliers, where rawData >45, radius not found, or eye not found
+uf = (abs(detrendedRawData) > 60 | abs([[0 0]; diff([[0 0]; diff(detrendedRawData)])])>5);
+uf = logical(uf);
+
+% Replace Outliers with previous 
+dummy = rawData;
+dummy(uf) = NaN;
+if isempty(uf)
+    % Do nothing
+elseif uf(1) == 1
+    dummy(1) = median(dummy, 'omitnan');
+end
+dummy = fillmissing(dummy, 'previous');
+
+% Low Pass Filter, cutoff of 5 Hz
+[b, a] = butter(4, 5/ceil(fs/2), "low");
+dummy = filtfilt(b, a, dummy);
+
+% Moving median to smooth signal, windowsize based on seconds of data
+dummy = movmedian(dummy, seconds*fs, 1,'Endpoints', 'shrink');
+
+
+filteredData = dummy;
+
+%% Gaussian filter
+
+w = gausswin(124*5);
+w = w/sum(w);
+y1 = filter(w, 1, testDataCalibrated.rightEye.X);
+y2 = filter(w, 1, testDataCalibrated.leftEye.X);
+figure()
+plot(y1)
+hold on
+plot(y2)
+
+%% FFT
+fs = 124;
+t = 1/fs;
+L = size(rawData,1);
+time= testDataRaw.time;
+
+Y = fftshift(fft(rawData));
+plot(fs/L*(0:L-1),abs(Y))
+
+%% pspectrum
+[p,f,t] = pspectrum(rawData, fs,'spectrogram');
+
+figure()
+waterfall(f,t,p')
+xlabel('Frequency (Hz)')
+ylabel('Time (seconds)')
+wtf = gca;
+wtf.XDir = 'reverse';
+view([30 45])
+
+%%
+M = 62;
+L = floor(62*0.2);
+lk = 0.7;
+pspectrum(rawData,fs,"spectrogram", ...
+    TimeResolution=M/fs,OverlapPercent=L/M*100, ...
+    Leakage=lk)
+title("pspectrum")
+cc = clim;
+xl = xlim;
+
+%%
+scatterData = [testDataRaw.leftEye.X, [0; diff([0; diff(testDataRaw.leftEye.X)])]];
+uniquePositionValues = unique(scatterData(:,1));
+positionAccelerationPairs = nan(size(uniquePositionValues,1), 3);
+positionAccelerationPairs(:,1) = uniquePositionValues;
+for i = 1:size(uniquePositionValues,1)
+    positionAccelerationPairs(i,2) = mean(scatterData(find(scatterData(:,1)==uniquePositionValues(i)), 2));  
+end
+
+fitCoeffs = polyfit(positionAccelerationPairs(:,1), positionAccelerationPairs(:,2),3);
+fitData = polyval(fitCoeffs, positionAccelerationPairs(:,1));
+fitDistances = fitData - positionAccelerationPairs(:,2);
+
+figure()
+scatter(positionAccelerationPairs(:,1),positionAccelerationPairs(:,2))
+hold on
+plot(positionAccelerationPairs(:,1), fitData)
+title(fileName, 'Interpreter','none')
+xlabel('Position')
+ylabel('Acceleration')
+
+figure()
+histogram(fitDistances, BinWidth=2)
+
+%%
+load("isControlList11Feb2025.mat")
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+
+allFits = array2table(nan(length(filePaths)*2, 7), ...
+    'VariableNames',{'isControl', 'Timepoint','Eye','X3', 'X2', 'X1', 'X0'});
+
+rowNum = 1;
+for i = 1:length(filePaths)
+    splitName = split(load(append(fileRoot, filePaths{i})).fileName, '_');
+
+    isCurrentFileControl = isControlList.isControl(strcmp(isControlList.Var1, splitName{2}))
+
+    if contains(load(append(fileRoot, filePaths{i})).fileName, 'RETEST')
+        timepoint = 2;
+    else
+        timepoint = 1;
+    end
+
+    for j = 1:2
+        allFits.isControl(rowNum) = isCurrentFileControl;
+        allFits.Timepoint(rowNum) = timepoint;
+        allFits.Eye(rowNum) = j;
+
+        if j == 1
+            [X3, X2, X1, X0] = getFit(load(append(fileRoot, filePaths{i})).testDataCalibrated.rightEye.X);
+        else
+            [X3, X2, X1, X0] = getFit(load(append(fileRoot, filePaths{i})).testDataCalibrated.leftEye.X);
+        end
+        allFits.X3(rowNum) = X3;
+        allFits.X2(rowNum) = X2;
+        allFits.X1(rowNum) = X1;
+        allFits.X0(rowNum) = X0;
+        rowNum = rowNum + 1;
+    end    
+end
+
+avgControlFitCoeffs = [mean(allFits.X3(allFits.isControl == 1)), mean(allFits.X2(allFits.isControl == 1)),mean(allFits.X1(allFits.isControl == 1)),mean(allFits.X0(allFits.isControl == 1))];
+avgPatientFitCoeffs = [mean(allFits.X3(allFits.isControl == 0)), mean(allFits.X2(allFits.isControl == 0)),mean(allFits.X1(allFits.isControl == 0)),mean(allFits.X0(allFits.isControl == 0))];
+
+figure()
+plot(-50:2:50, polyval(avgControlFitCoeffs, -50:2:50))
+hold on
+plot(-50:2:50, polyval(avgPatientFitCoeffs, -50:2:50))
+legend('Controls', 'Patients')
+
+
 %% Functions
+
+function [X3, X2, X1, X0] = getFit(inputData)
+    acceleration = [0; diff([0; diff(inputData)])];
+    uniquePositionValues = unique(inputData);
+    positionAccelerationPairs = nan(size(uniquePositionValues,1), 2);
+    positionAccelerationPairs(:,1) = uniquePositionValues;
+    for i = 1:size(uniquePositionValues,1)
+        positionAccelerationPairs(i,2) = mean(acceleration(find(inputData(:,1)==uniquePositionValues(i))));  
+    end
+    fitCoeffs = polyfit(positionAccelerationPairs(:,1), positionAccelerationPairs(:,2),3);
+    X3 = fitCoeffs(1);
+    X2 = fitCoeffs(2);
+    X1 = fitCoeffs(3);
+    X0 = fitCoeffs(4);
+end
+
 function returnPoint = medianReplace(segment)
     dataPoint = segment(round(length(segment)/2));
     

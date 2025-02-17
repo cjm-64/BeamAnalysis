@@ -74,7 +74,7 @@ while inRange == 1
 
     if sum(strcmp(splitFileNames(i,2), splitFileNames(:,2))) > 1
         % This participant has both files
-        longitudinalParticipants(partLoc, 1) = join(splitFileNames(i, 1:2), '_');
+        longitudinalParticipants(partLoc, 1) = splitFileNames(i, 2);
         partLoc = partLoc + 1;
         i = i + 2;
     else
@@ -94,7 +94,7 @@ fileNameSuffixes = unique(splitFileNames(:,3));
 for i = 1:length(longitudinalParticipants)
     for j = 1:size(fileNameSuffixes,1)
         loadedFileName = join([longitudinalParticipants(i) fileNameSuffixes(j)], '_');
-        load(append(sourceDirectory,'\', loadedFileName));
+        load(append(sourceDirectory,'\BEAM_', loadedFileName));
         disp(loadedFileName);
 
         if contains(loadedFileName, 'RETEST')
@@ -111,8 +111,15 @@ for i = 1:length(longitudinalParticipants)
     end
 end
 
+load isControlList.mat
+isControl = zeros(size(longitudinalParticipants, 1), 1);
+for i = 1:length(longitudinalParticipants)
+    isControl(i) = isControlList.isControl(isControlList.participantName == longitudinalParticipants(i));
+end
+
+outputTable = table(longitudinalParticipants, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians, isControl);
+
 %%
-outputTable = table(longitudinalParticipants, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians);
 writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Retest ', char(datetime("today")), '.csv'))
 
 
@@ -162,8 +169,29 @@ end
 outputTable = table(fileNames', timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
 % writetable(outputTable, append(extractBefore(filePath, 'Data'), 'BEAM ARVO Export ', char(datetime("today")), '.csv'))
 
+%% All data into 1 mat
 
-
+sourceDirectory = uigetdir('Data\');
+fileList = dir(sourceDirectory);
+numParticipants = strings(length(dir([sourceDirectory, '\BEAM*'])), 1);
+allData = cell(length(numParticipants), 9);
+isControl = [ones(1,16), 0, ones(1,16), zeros(1, 6), ones(1,6), zeros(1, 16), ones(1,4)]';
+for i = 3:length(fileList)
+    load(append(sourceDirectory, '\', fileList(i).name));
+    allData{i-2,1} = extractBefore(extractAfter(fileName, 'BEAM_'), '_');
+    allData{i-2,2} = deviations.time;
+    allData{i-2,3} = deviations.percentage;
+    allData{i-2,4} = deviations.maxSize;
+    allData{i-2,5} = deviations.meanSize;
+    allData{i-2,6} = deviations.medianSize;
+    if contains(fileName, 'RETEST')
+        allData{i-2,7} = 2;
+    else
+        allData{i-2,7} = 1;
+    end
+    allData{i-2,8} = isControl(i-2);
+    allData{i-2,9} = testDataFinal.X;
+end
 
 
 

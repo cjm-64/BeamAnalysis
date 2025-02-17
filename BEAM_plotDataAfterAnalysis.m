@@ -46,17 +46,18 @@ ylim([-50, 50])
 %% Plot Final data with deviations
 
 figure()
-plot(testDataFinal.time, testDataFinal.X,'b')
+yline(0,'k')
 hold on
+plot(testDataFinal.time, testDataFinal.X,'b')
 yline(deviations.threshold, 'r--')
 yline(-1*deviations.threshold, 'r--')
 if ~isnan(deviations.X.startAndEnds(1,1))
     plot(testDataFinal.time(deviations.X.startAndEnds(:,1)), testDataFinal.X(deviations.X.startAndEnds(:,1)), 'g*')
     plot(testDataFinal.time(deviations.X.startAndEnds(:,2)), testDataFinal.X(deviations.X.startAndEnds(:,2)), 'm*')
     plot(testDataFinal.time(deviations.X.magnitude(:,2)), testDataFinal.X(deviations.X.magnitude(:,2)),'k*')
-    legend('Deviation Amount','Threshold','Threshold','Deviation Onset', 'Deviation End', 'Max deviation', 'Location','northwest')
+    legend('','Deviation Amount','Threshold','Threshold','Deviation Onset', 'Deviation End', 'Max deviation', 'Location','northwest')
 else
-    legend('Deviation Amount','Threshold','Threshold', 'Location','northwest')
+    legend('','Deviation Amount','Threshold','Threshold', 'Location','northwest')
 end
 ylim([-50, 50])
 xlabel('Time (s)')
@@ -66,8 +67,8 @@ title(input('Title the Graph: ', 's'))
 
 %% Plot histogram
 figure()
-% histogram(abs(testDataFinal.X), 'BinWidth', 2, 'FaceColor', 'c')
-histogram(testDataFinal.X, 'FaceColor', 'c')
+histogram(testDataFinal.X, 'BinWidth', 2, 'FaceColor', 'c')
+% histogram(testDataFinal.X, 'FaceColor', 'c')
 xlabel('Prism Diopters')
 ylabel('Frame Count')
-title('Histogram of deviation over time')
+title(input('Title the Graph: ', 's'))

@@ -18,15 +18,17 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     %% Center Data
     testDataCentered = centerData(testDataRaw, calibrationCoeffs);
     
-    %% Apply Calibration
-    testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
-    
-    %% Filter Data
-    testDataFiltered = filterBEAMData(testDataCalibrated);
+%     %% Apply Calibration
+%     testDataCalibrated = calibrateBEAMData(testDataCentered, calibrationCoeffs);
+% 
+%     testDataDetrended = detrendBEAMData(testDataCalibrated)
+%     
+%     %% Filter Data
+%     testDataFiltered = filterBEAMData(testDataDetrended);
     
     %% Check Calibration and Centering, then Detrend Data
     close all
-    [testDataDetrended, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
+    [testDataCalibrated, testDataDetrended,testDataFiltered, calibrationCoeffs] = manualCalibrationBEAM(testDataCentered, calibrationCoeffs);
     
     %% Save Processed Data
     save(strcat('Data/Processed/', fileName, '.mat'), "testDataCentered", "testDataCalibrated", "testDataFiltered", "testDataDetrended")
@@ -47,12 +49,14 @@ function BEAMAnalysisAutomaticCalibration(fileName)
         deviations.maxSize = max(deviations.X.magnitude(:,1));
         deviations.meanSize = mean(deviations.X.magnitude(:,1));
         deviations.medianSize = median(deviations.X.magnitude(:,1))
+        deviations.number = deviations.X.number;
     else
         deviations.time = 0;
         deviations.percentage = 0;
         deviations.maxSize = 0;
         deviations.meanSize = 0;
         deviations.medianSize = 0;
+        deviations.number = 0;
         disp ("No Deviations")
     end
     
