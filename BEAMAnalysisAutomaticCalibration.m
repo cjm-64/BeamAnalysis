@@ -43,9 +43,9 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     %% Locate Deviations
     threshold = 10;
     deviations = calculateDeviations(testDataFinal, threshold);
-    if ~isnan(deviations.X.startAndEnds(1,1)) 
+    if (deviations.X.startAndEnds(1,1)) ~= 0
         deviations.time = sum(deviations.X.lengths(:,2));
-        deviations.percentage = (sum(deviations.X.lengths(:,2))/max(testDataFinal.time))*100;
+        deviations.percentage = (deviations.time/max(testDataFinal.time))*100;
         deviations.maxSize = max(deviations.X.magnitude(:,1));
         deviations.meanSize = mean(deviations.X.magnitude(:,1));
         deviations.medianSize = median(deviations.X.magnitude(:,1))

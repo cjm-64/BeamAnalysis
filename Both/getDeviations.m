@@ -1,8 +1,8 @@
-function deviations = getDeviations(data, threshold, fps)
+function deviations = getDeviations(data, threshold, fps, seconds)
     deviationCount = 1;
     isDeviated = false;
     deviations = zeros(2,1);
-    frames2sec = 10*fps;
+    frames2sec = seconds*fps;
     for i = 1:size(data, 1)
         % Data is deviated (above threshold)
         if data(i) > threshold
@@ -34,7 +34,7 @@ function deviations = getDeviations(data, threshold, fps)
             end
         end
     end
-    if size(deviations, 2) > 1 && isnan(deviations(1, size(deviations, 2)))
+    if size(deviations, 2) > 1 && deviations(1, size(deviations, 2)) == 0
         deviations = deviations(:, 1:size(deviations, 2)-1);
     end
 end

@@ -1136,16 +1136,15 @@ for i = 1:length(filePaths)
     names(i) = splitName{2};
 end
 participantName = unique(names);
-isControl = [ones(8,1); 0; ones(8,1); zeros(3,1); ones(3,1); zeros(8,1); [1;1;0;1]];
+isControl = [ones(8,1); 0; ones(8,1); zeros(3,1); ones(3,1); zeros(8,1); [1;1;0;1;0]];
 isControlList = table(participantName, isControl);
 
 %% Test detection of deviation lengths
 
 clear
 
-% Load Data - Only IXT or BNC, not both at same time
 [filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
-allData = cell(ceil(length(filePaths)/2), 7, 2);
+allData = cell(ceil(length(filePaths)/2), 8, 2);
 row = 0;
 page = 1;
 testRowNum = 0;
@@ -1166,11 +1165,60 @@ for i = 1:length(filePaths)
     allData{row, 1, page} = splitNames{2};
     allData{row, 2, page} = load(append(fileRoot, filePaths{i})).testDataFinal.X;
     allData{row, 3, page} = load(append(fileRoot, filePaths{i})).testDataFinal.fps;
+    allData{row, 4, page} = max(load(append(fileRoot, filePaths{i})).testDataFinal.time);
+end
+
+%% heatmap to find where is best to set cutoffs
+allPercentages = nan(35, 10, 10, 2);
+for threshold = 1:10
+    for seconds = 1:10
+        for timepoint = 1:2
+            allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData(:, 2, timepoint), allData(:, 3, timepoint), 'UniformOutput', false), allData(:, 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData(:, 4, timepoint));
+        end
+    end
 end
 
 %%
-for i = 1:2
-    allData(:, 4, i) = cellfun(@(x,y) getDeviations(x, 10, y)', allData(:, 2, i), allData(:, 3, i), 'UniformOutput', false);
-    allData(:, 5, i) = cellfun(@(x,y) getDeviationLengths(x,y), allData(:, 4, i), allData(:, 3, i), 'UniformOutput', false);
+
+totalICCScores = nan(10, 10);
+for threshold = 1:10
+    for seconds = 1:10
+        totalICCScores(threshold, seconds) = ICC([allPercentages(outputTable.isControl == 1, threshold, seconds, 1) allPercentages(outputTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
+    end
 end
 
+h = heatmap(totalICCScores);
+h.YDisplayData{10:-1:1};
+h.XDisplayData{1:10};
+% totalICCScores = nan(2, 10, 10);
+% for threshold = 1:10
+%     for seconds = 1:10
+%         for control = 2:-1:1
+%             totalICCScores(control, threshold, seconds) = ICC([allPercentages(outputTable.isControl == control-1, threshold, seconds, 1) allPercentages(outputTable.isControl == control-1, threshold, seconds, 2)], '1-1', 0.95);
+%         end
+%     end
+% end
+
+%%
+for i = 1:2
+    allData(:, 5, i) = cellfun(@(x,y) getDeviations(abs(x), 10, y)', allData(:, 2, i), allData(:, 3, i), 'UniformOutput', false);
+    allData(:, 6, i) = cellfun(@(x,y) getDeviationLengths(x,y), allData(:, 5, i), allData(:, 3, i), 'UniformOutput', false);
+    allData(:, 7, i) = cellfun(@(x) flip(sum(x, 1)), allData(:, 6, i), 'UniformOutput', false);
+    allData(:, 8, i) = num2cell(cellfun(@(x, y) (x(1)/y)*100, allData(:, 7, i), allData(:, 4, i)));
+end
+
+%%
+thresholdData = nan(35, 10, 2);
+secondsData = nan(35, 10, 2);
+threshold = 10;
+for seconds = 1:10
+    for page = 1:2
+        secondsData(:,seconds,page) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData(:, 2, page), allData(:, 3, page), 'UniformOutput', false), allData(:, 3, page), 'UniformOutput', false), 'UniformOutput', false), allData(:, 4, page));
+    end
+end
+
+ICCScoresSeconds = nan(2, 10);
+for i = 1:size(secondsData,2)
+    ICCScoresSeconds(1,i) = ICC([secondsData(outputTable.isControl == 1, i, 1) secondsData(outputTable.isControl == 1, i, 2)], '1-1', 0.95);
+    ICCScoresSeconds(2,i) = ICC([secondsData(outputTable.isControl == 0, i, 1) secondsData(outputTable.isControl == 0, i, 2)], '1-1', 0.95);
+end
