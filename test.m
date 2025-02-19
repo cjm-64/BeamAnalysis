@@ -1170,6 +1170,10 @@ end
 
 %% heatmap to find where is best to set cutoffs
 allPercentages = nan(35, 15, 15, 2);
+% series of cell funcitons to get deviations -> get the lengths of each ->
+% get the time of tecah -> convert to percentage of total test time
+% repeat with the threshold being 1-15 PD and the min deviation size being
+% 1:15 seconds
 for threshold = 1:15
     for seconds = 1:15
         for timepoint = 1:2
@@ -1178,8 +1182,7 @@ for threshold = 1:15
     end
 end
 
-%%
-
+% Calculate ICC scores for all the controls at each threshold and time
 totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
 for threshold = 1:size(totalICCScores, 1)
     for seconds = 1:size(totalICCScores, 2)
@@ -1187,7 +1190,7 @@ for threshold = 1:size(totalICCScores, 1)
     end
 end
 
-%%
+% Create heatmaps to show the results
 xvalues = cellstr(string(1:15));
 yvalues = cellstr(string(15:-1:1));
 
