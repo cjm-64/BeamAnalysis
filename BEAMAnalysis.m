@@ -175,7 +175,7 @@ sourceDirectory = uigetdir('Data\');
 fileList = dir(sourceDirectory);
 numParticipants = strings(length(dir([sourceDirectory, '\BEAM*'])), 1);
 allData = cell(length(numParticipants), 9);
-isControl = [ones(1,16), 0, ones(1,16), zeros(1, 6), ones(1,6), zeros(1, 16), ones(1,4)]';
+isControl = [ones(1,16), 0, ones(1,16), zeros(1, 6), ones(1,6), zeros(1, 16), ones(1,4), [0, 0, 1, 1, 0, 0]]';
 for i = 3:length(fileList)
     load(append(sourceDirectory, '\', fileList(i).name));
     allData{i-2,1} = extractBefore(extractAfter(fileName, 'BEAM_'), '_');

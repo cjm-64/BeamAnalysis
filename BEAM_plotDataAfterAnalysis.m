@@ -29,9 +29,9 @@ title("Calibrated")
 legend("Right Eye", "Left Eye")
 
 subplot(3,2,4)
-plot(testDataFiltered.time, testDataFiltered.rightEye.X, 'r')
+plot(testDataDetrended.time, testDataDetrended.rightEye.X, 'r')
 hold on
-plot(testDataFiltered.time, testDataFiltered.leftEye.X, 'b')
+plot(testDataDetrended.time, testDataDetrended.leftEye.X, 'b')
 ylim([-50, 50])
 title("Filtered")
 legend("Right Eye", "Left Eye")

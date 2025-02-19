@@ -1143,6 +1143,7 @@ isControlList = table(participantName, isControl);
 
 clear
 
+% Load every participant with both test and retest
 [filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 allData = cell(ceil(length(filePaths)/2), 8, 2);
 row = 0;
