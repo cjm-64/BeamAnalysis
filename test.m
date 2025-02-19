@@ -1169,9 +1169,9 @@ for i = 1:length(filePaths)
 end
 
 %% heatmap to find where is best to set cutoffs
-allPercentages = nan(35, 10, 10, 2);
-for threshold = 1:10
-    for seconds = 1:10
+allPercentages = nan(35, 15, 15, 2);
+for threshold = 1:15
+    for seconds = 1:15
         for timepoint = 1:2
             allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData(:, 2, timepoint), allData(:, 3, timepoint), 'UniformOutput', false), allData(:, 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData(:, 4, timepoint));
         end
@@ -1180,24 +1180,28 @@ end
 
 %%
 
-totalICCScores = nan(10, 10);
-for threshold = 1:10
-    for seconds = 1:10
+totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
+for threshold = 1:size(totalICCScores, 1)
+    for seconds = 1:size(totalICCScores, 2)
         totalICCScores(threshold, seconds) = ICC([allPercentages(outputTable.isControl == 1, threshold, seconds, 1) allPercentages(outputTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
     end
 end
 
-h = heatmap(totalICCScores);
-h.YDisplayData{10:-1:1};
-h.XDisplayData{1:10};
-% totalICCScores = nan(2, 10, 10);
-% for threshold = 1:10
-%     for seconds = 1:10
-%         for control = 2:-1:1
-%             totalICCScores(control, threshold, seconds) = ICC([allPercentages(outputTable.isControl == control-1, threshold, seconds, 1) allPercentages(outputTable.isControl == control-1, threshold, seconds, 2)], '1-1', 0.95);
-%         end
-%     end
-% end
+%%
+xvalues = cellstr(string(1:15));
+yvalues = cellstr(string(15:-1:1));
+
+figure()
+heatmap(xvalues,yvalues,flipud(totalICCScores), 'Colormap', parula);
+xlabel('Min Deviation Time (s)')
+ylabel('Min Deviation Threshold (PD)')
+title('Heatmap with all ICC datapoints')
+
+figure()
+heatmap(xvalues,yvalues(1:6),flipud(totalICCScores(10:15, :)), 'Colormap', parula);
+xlabel('Min Deviation Time (s)')
+ylabel('Min Deviation Threshold (PD)')
+title('Heatmap with low ICC datapoints removed')
 
 %%
 for i = 1:2
