@@ -54,8 +54,8 @@ for i = 1:length(fileList)
     writeRowLocation = writeRowLocation + 1;
 end
 
-outputTable = table(numParticipants, timepoint, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians);
-writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'BNC v IXT Output ', char(datetime("today")), '.csv'))
+testRetestTable = table(numParticipants, timepoint, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians);
+writetable(testRetestTable, append(extractBefore(sourceDirectory, 'Data'), 'BNC v IXT Output ', char(datetime("today")), '.csv'))
 
 %% Prep For Export - Test-Retest
 sourceDirectory = uigetdir('Data\');
@@ -88,7 +88,11 @@ deviationPercentages = zeros(size(longitudinalParticipants, 1), 2);
 deviationMaxes = zeros(size(longitudinalParticipants, 1), 2);
 deviationMeans = zeros(size(longitudinalParticipants, 1), 2);
 deviationMedians = zeros(size(longitudinalParticipants, 1), 2);
+timepoint = zeros(size(longitudinalParticipants, 1), 2);
+isControl = zeros(size(longitudinalParticipants, 1), 2);
 
+
+load isControlList.mat
 writeColLocation = 1;
 fileNameSuffixes = unique(splitFileNames(:,3));
 for i = 1:length(longitudinalParticipants)
@@ -108,19 +112,26 @@ for i = 1:length(longitudinalParticipants)
         deviationMaxes(i,writeColLocation) = deviations.maxSize;
         deviationMeans(i,writeColLocation) = deviations.meanSize;
         deviationMedians(i,writeColLocation) = deviations.medianSize;
+        timepoint(i,writeColLocation) = writeColLocation;
+        isControl(i,writeColLocation) = isControlList.isControl(isControlList.participantName == longitudinalParticipants(i));
     end
 end
 
-load isControlList.mat
-isControl = zeros(size(longitudinalParticipants, 1), 1);
-for i = 1:length(longitudinalParticipants)
-    isControl(i) = isControlList.isControl(isControlList.participantName == longitudinalParticipants(i));
-end
+% load isControlList.mat
+% isControl = zeros(size(longitudinalParticipants, 1), 1);
+% for i = 1:length(longitudinalParticipants)
+%     isControl(i) = isControlList.isControl(isControlList.participantName == longitudinalParticipants(i));
+% end
 
-outputTable = table(longitudinalParticipants, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians, isControl);
+%% Create table for test-retest
+testRetestTable = table(longitudinalParticipants, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians, isControl(:,1));
+testRetestTable.Properties.VariableNames(7) = {'isControl'};
+writetable(testRetestTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Retest ', char(datetime("today")), '.csv'))
 
-%%
-writetable(outputTable, append(extractBefore(sourceDirectory, 'Data'), 'Test-Retest ', char(datetime("today")), '.csv'))
+%% Create table for anova
+anovaTable = table([longitudinalParticipants; longitudinalParticipants], deviationTimes(:), deviationPercentages(:), deviationMaxes(:), deviationMeans(:), deviationMedians(:), isControl(:), timepoint(:));
+anovaTable.Properties.VariableNames = {'Name', 'deviationTime', 'deviationPercentage', 'deviationMax', 'deviationMean', 'deviationMedian', 'isControl', 'Timepoint'};
+writetable(anovaTable, append(extractBefore(sourceDirectory, 'Data'), 'Anova ', char(datetime("today")), '.csv'))
 
 
 
@@ -166,7 +177,7 @@ for i = 1:length(fileNames)
     end
 end
 
-outputTable = table(fileNames', timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
+testRetestTable = table(fileNames', timepoint, percentages, BEAMofficeControlScore, meanDeviation, medianDeviation);
 % writetable(outputTable, append(extractBefore(filePath, 'Data'), 'BEAM ARVO Export ', char(datetime("today")), '.csv'))
 
 %% All data into 1 mat

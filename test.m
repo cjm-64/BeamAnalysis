@@ -1171,7 +1171,7 @@ end
 
 %% heatmap to find where is best to set cutoffs
 allPercentages = nan(35, 15, 15, 2);
-% series of cell funcitons to get deviations -> get the lengths of each ->
+% series of cell functions to get deviations -> get the lengths of each ->
 % get the time of tecah -> convert to percentage of total test time
 % repeat with the threshold being 1-15 PD and the min deviation size being
 % 1:15 seconds
@@ -1187,7 +1187,15 @@ end
 totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
 for threshold = 1:size(totalICCScores, 1)
     for seconds = 1:size(totalICCScores, 2)
-        totalICCScores(threshold, seconds) = ICC([allPercentages(outputTable.isControl == 1, threshold, seconds, 1) allPercentages(outputTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
+        totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
+    end
+end
+
+% Calculate ICC scores for all the controls at each threshold and time
+totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
+for threshold = 1:size(totalICCScores, 1)
+    for seconds = 1:size(totalICCScores, 2)
+        totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
     end
 end
 
