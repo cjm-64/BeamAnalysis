@@ -1167,10 +1167,11 @@ for i = 1:length(filePaths)
     allData{row, 2, page} = load(append(fileRoot, filePaths{i})).testDataFinal.X;
     allData{row, 3, page} = load(append(fileRoot, filePaths{i})).testDataFinal.fps;
     allData{row, 4, page} = max(load(append(fileRoot, filePaths{i})).testDataFinal.time);
+    i
 end
 
 %% heatmap to find where is best to set cutoffs
-allPercentages = nan(35, 15, 15, 2);
+allPercentages = nan(size(allData, 1), 15, 15, 2);
 % series of cell functions to get deviations -> get the lengths of each ->
 % get the time of tecah -> convert to percentage of total test time
 % repeat with the threshold being 1-15 PD and the min deviation size being
@@ -1181,23 +1182,34 @@ for threshold = 1:15
             allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData(:, 2, timepoint), allData(:, 3, timepoint), 'UniformOutput', false), allData(:, 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData(:, 4, timepoint));
         end
     end
+    threshold
+end
+
+allPercentages = nan(size(allData, 1)-2, 15, 15, 2);
+for threshold = 1:15
+    for seconds = 1:15
+        for timepoint = 1:2
+            allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData([1:14, 17:end], 2, timepoint), allData([1:14, 17:end], 3, timepoint), 'UniformOutput', false), allData([1:14, 17:end], 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData([1:14, 17:end], 4, timepoint));
+        end
+    end
+    threshold
 end
 
 % Calculate ICC scores for all the controls at each threshold and time
 totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
 for threshold = 1:size(totalICCScores, 1)
     for seconds = 1:size(totalICCScores, 2)
-        totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
+        totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 2)], '1-1', 0.95);
     end
 end
 
-% Calculate ICC scores for all the controls at each threshold and time
-totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
-for threshold = 1:size(totalICCScores, 1)
-    for seconds = 1:size(totalICCScores, 2)
-        totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl == 1, threshold, seconds, 2)], '1-1', 0.95);
-    end
-end
+% % Calculate ICC scores for all the IXTs at each threshold and time
+% totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
+% for threshold = 1:size(totalICCScores, 1)
+%     for seconds = 1:size(totalICCScores, 2)
+%         totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl == 0, threshold, seconds, 1) allPercentages(testRetestTable.isControl == 0, threshold, seconds, 2)], '1-1', 0.95);
+%     end
+% end
 
 % Create heatmaps to show the results
 xvalues = cellstr(string(1:15));
