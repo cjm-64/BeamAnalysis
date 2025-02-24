@@ -41,8 +41,9 @@ function BEAMAnalysisAutomaticCalibration(fileName)
     save(strcat('Data/Subracted/', fileName, '.mat'), "testDataFinal")
     
     %% Locate Deviations
-    threshold = 10;
-    deviations = calculateDeviations(testDataFinal, threshold);
+    threshold = 12;
+    seconds = 1;
+    deviations = calculateDeviations(testDataFinal, threshold, seconds);
     if (deviations.X.startAndEnds(1,1)) ~= 0
         deviations.time = sum(deviations.X.lengths(:,2));
         deviations.percentage = (deviations.time/max(testDataFinal.time))*100;

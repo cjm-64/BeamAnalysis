@@ -1,4 +1,4 @@
-function deviations = calculateDeviations(testDataFinal, threshold)
+function deviations = calculateDeviations(testDataFinal, threshold, seconds)
     
     directions = fieldnames(testDataFinal);
     testBool = true;
@@ -6,7 +6,7 @@ function deviations = calculateDeviations(testDataFinal, threshold)
         if any(strcmp(directions(dir), ["time", "fps", "Y"]))
             continue;
         else
-            deviations.(directions{dir}).startAndEnds = getDeviations(abs(testDataFinal.(directions{dir})), threshold, testDataFinal.fps, 10)';
+            deviations.(directions{dir}).startAndEnds = getDeviations(abs(testDataFinal.(directions{dir})), threshold, testDataFinal.fps, seconds)';
             if deviations.(directions{dir}).startAndEnds(1,1) ~= 0             
                 deviations.(directions{dir}).lengths = getDeviationLengths(deviations.(directions{dir}).startAndEnds, testDataFinal.fps);
                 deviations.(directions{dir}).magnitude = getDeviationMagnitudes(abs(testDataFinal.(directions{dir})), deviations.(directions{dir}).startAndEnds);

@@ -61,7 +61,7 @@ else
 end
 ylim([-50, 50])
 xlabel('Time (s)')
-ylabel('<--- Left Eye Trope      Prism Diopters (PD)      Right Eye Trope --->')
+ylabel('<--- Left Eye Exodeviation   Prism Diopters (PD)   Right Eye Exodeviation --->')
 title(input('Title the Graph: ', 's'))
 
 

@@ -1,7 +1,7 @@
 
-load('Data\Final\BEAM_NJIT003_TEST.mat')
+load('Data\Final\BEAM_NJIT005_TEST.mat')
 c1 = testDataFinal.X;
-load('Data\Final\BEAM_NJIT003_RETEST.mat')
+load('Data\Final\BEAM_NJIT005_RETEST.mat')
 c2 = testDataFinal.X;
 load('Data\Final\BEAM_SALUS001_TEST.mat')
 p1 = testDataFinal.X;

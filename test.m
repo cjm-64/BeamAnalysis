@@ -1195,21 +1195,25 @@ for threshold = 1:15
     threshold
 end
 
-% Calculate ICC scores for all the controls at each threshold and time
-totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
-for threshold = 1:size(totalICCScores, 1)
-    for seconds = 1:size(totalICCScores, 2)
-        totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 2)], '1-1', 0.95);
-    end
-end
-
-% % Calculate ICC scores for all the IXTs at each threshold and time
+% % Calculate ICC scores for all the controls at each threshold and time
 % totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
 % for threshold = 1:size(totalICCScores, 1)
 %     for seconds = 1:size(totalICCScores, 2)
-%         totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl == 0, threshold, seconds, 1) allPercentages(testRetestTable.isControl == 0, threshold, seconds, 2)], '1-1', 0.95);
+%         totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 2)], '1-1', 0.95);
 %     end
 % end
+
+% Calculate ICC scores for all the IXTs at each threshold and time
+totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
+for threshold = 1:size(totalICCScores, 1)
+    for seconds = 1:size(totalICCScores, 2)
+        for control = 0:1
+            totalICCScores(threshold, seconds, control+1) = ICC([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)], '1-1', 0.95);
+        end
+    end
+end
+
+
 
 % Create heatmaps to show the results
 xvalues = cellstr(string(1:15));
@@ -1227,6 +1231,12 @@ xlabel('Min Deviation Time (s)')
 ylabel('Min Deviation Threshold (PD)')
 title('Heatmap with low ICC datapoints removed')
 
+ICCsubtracted = totalICCScores(:,:,1) - totalICCScores(:,:,2);
+figure()
+heatmap(xvalues,yvalues,flipud(ICCsubtracted), 'Colormap', parula);
+xlabel('Min Deviation Time (s)')
+ylabel('Min Deviation Threshold (PD)')
+title('Heatmap with all ICC datapoints')
 %%
 for i = 1:2
     allData(:, 5, i) = cellfun(@(x,y) getDeviations(abs(x), 10, y)', allData(:, 2, i), allData(:, 3, i), 'UniformOutput', false);
