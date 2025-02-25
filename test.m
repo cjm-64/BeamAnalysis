@@ -1179,21 +1179,21 @@ allPercentages = nan(size(allData, 1), 15, 15, 2);
 for threshold = 1:15
     for seconds = 1:15
         for timepoint = 1:2
-            allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData(:, 2, timepoint), allData(:, 3, timepoint), 'UniformOutput', false), allData(:, 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData(:, 4, timepoint));
+            allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) sum(x(:,2)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData(:, 2, timepoint), allData(:, 3, timepoint), 'UniformOutput', false), allData(:, 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData(:, 4, timepoint));
         end
     end
     threshold
 end
 
-allPercentages = nan(size(allData, 1)-2, 15, 15, 2);
-for threshold = 1:15
-    for seconds = 1:15
-        for timepoint = 1:2
-            allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData([1:14, 17:end], 2, timepoint), allData([1:14, 17:end], 3, timepoint), 'UniformOutput', false), allData([1:14, 17:end], 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData([1:14, 17:end], 4, timepoint));
-        end
-    end
-    threshold
-end
+% allPercentages = nan(size(allData, 1)-2, 15, 15, 2);
+% for threshold = 1:15
+%     for seconds = 1:15
+%         for timepoint = 1:2
+%             allPercentages(:, threshold, seconds, timepoint) = cellfun(@(x, y) (x(1)/y)*100, cellfun(@(x) flip(sum(x, 1)), cellfun(@(x,y) getDeviationLengths(x,y), cellfun(@(x,y) getDeviations(abs(x), threshold, y, seconds)', allData([1:14, 17:end], 2, timepoint), allData([1:14, 17:end], 3, timepoint), 'UniformOutput', false), allData([1:14, 17:end], 3, timepoint), 'UniformOutput', false), 'UniformOutput', false), allData([1:14, 17:end], 4, timepoint));
+%         end
+%     end
+%     threshold
+% end
 
 % % Calculate ICC scores for all the controls at each threshold and time
 % totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3));
@@ -1208,7 +1208,7 @@ totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
 for threshold = 1:size(totalICCScores, 1)
     for seconds = 1:size(totalICCScores, 2)
         for control = 0:1
-            totalICCScores(threshold, seconds, control+1) = ICC([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)], '1-1', 0.95);
+            totalICCScores(threshold, seconds, control+1) = round(ICC([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)], '1-1', 0.95), 2, "significant");
         end
     end
 end
@@ -1220,7 +1220,7 @@ xvalues = cellstr(string(1:15));
 yvalues = cellstr(string(15:-1:1));
 
 figure()
-heatmap(xvalues,yvalues,flipud(totalICCScores), 'Colormap', parula);
+heatmap(xvalues,yvalues,flipud(totalICCScores(:,:,2)), 'Colormap', parula);
 xlabel('Min Deviation Time (s)')
 ylabel('Min Deviation Threshold (PD)')
 title('Heatmap with all ICC datapoints')
@@ -1231,7 +1231,7 @@ xlabel('Min Deviation Time (s)')
 ylabel('Min Deviation Threshold (PD)')
 title('Heatmap with low ICC datapoints removed')
 
-ICCsubtracted = totalICCScores(:,:,1) - totalICCScores(:,:,2);
+ICCsubtracted = totalICCScores(:,:,2) - totalICCScores(:,:,1);
 figure()
 heatmap(xvalues,yvalues,flipud(ICCsubtracted), 'Colormap', parula);
 xlabel('Min Deviation Time (s)')
@@ -1260,3 +1260,62 @@ for i = 1:size(secondsData,2)
     ICCScoresSeconds(1,i) = ICC([secondsData(outputTable.isControl == 1, i, 1) secondsData(outputTable.isControl == 1, i, 2)], '1-1', 0.95);
     ICCScoresSeconds(2,i) = ICC([secondsData(outputTable.isControl == 0, i, 1) secondsData(outputTable.isControl == 0, i, 2)], '1-1', 0.95);
 end
+
+%% Figure out average calibration values
+
+% Load every participant with both test and retest
+[filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
+allCalibrationData = nan(ceil(length(filePaths)/2), 4);
+row = 0;
+col = 0;
+testRowNum = 0;
+retestRowNum = 0;
+
+
+for i = 1:length(filePaths)
+    splitNames = split(filePaths{i}, '_');
+
+
+    if contains(filePaths{i}, 'RETEST')
+        col = 3;
+        retestRowNum = retestRowNum + 1;
+        row = retestRowNum;
+    else
+        col = 1;
+        testRowNum = testRowNum + 1;
+        row = testRowNum;
+    end
+    currCoeffs = getCalibrationCoeffs(load(append(fileRoot, filePaths{i})).calibrationDataRaw);
+    allCalibrationData(row, col) = currCoeffs.rightEye.value;
+    allCalibrationData(row, col+1) = currCoeffs.leftEye.value;
+    i
+end
+
+allConfIntervals = nan(size(allCalibrationData,2), 2);
+for i = 1:size(allCalibrationData,2)
+    x = allCalibrationData(:,i);                      % Create Data
+    SEM = std(x)/sqrt(length(x));               % Standard Error
+    ts = tinv([0.025  0.975],length(x)-1);      % T-Score
+    allConfIntervals(i,:) = mean(x) + ts*SEM;
+end
+
+%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
