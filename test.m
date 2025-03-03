@@ -1202,17 +1202,27 @@ end
 %         totalICCScores(threshold, seconds) = ICC([allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 1) allPercentages(testRetestTable.isControl([1:14, 17:end]) == 1, threshold, seconds, 2)], '1-1', 0.95);
 %     end
 % end
-
+%%
 % Calculate ICC scores for all the IXTs at each threshold and time
+
+% totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
+% for threshold = 1:size(totalICCScores, 1)
+%     for seconds = 1:size(totalICCScores, 2)
+%         for control = 0:1
+%             totalICCScores(threshold, seconds, control+1) = round(ICC([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)], 'A-1', 0.95), 2, "significant");
+%         end
+%     end
+% end
+
 totalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
 for threshold = 1:size(totalICCScores, 1)
     for seconds = 1:size(totalICCScores, 2)
         for control = 0:1
-            totalICCScores(threshold, seconds, control+1) = round(ICC([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)], '1-1', 0.95), 2, "significant");
+            totalICCScores(threshold, seconds, control+1) = round(ICC([allPercentages(testRetestTable.isControl([1:15, 17:35]) == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl([1:15, 17:35]) == control, threshold, seconds, 2)], 'C-1', 0.95), 2, "significant");
         end
     end
 end
-
+%%
 
 
 % Create heatmaps to show the results
