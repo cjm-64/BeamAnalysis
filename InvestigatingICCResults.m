@@ -49,9 +49,10 @@ for threshold = 1:15
     threshold
 end
 
+
 allDataTotalICCScores = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
-for threshold = 1:size(totalICCScores, 1)
-    for seconds = 1:size(totalICCScores, 2)
+for threshold = 1:size(allDataTotalICCScores, 1)
+    for seconds = 1:size(allDataTotalICCScores, 2)
         for control = 0:1
             allDataTotalICCScores(threshold, seconds, control+1) = round(ICC([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)], 'A-1', 0.95), 2, "significant");
         end
@@ -73,8 +74,8 @@ for threshold = 1:15
 end
 
 outliersTotalICCScores = nan(size(outlierPercentages, 2), size(outlierPercentages, 3), 2);
-for threshold = 1:size(totalICCScores, 1)
-    for seconds = 1:size(totalICCScores, 2)
+for threshold = 1:size(outliersTotalICCScores, 1)
+    for seconds = 1:size(outliersTotalICCScores, 2)
         for control = 0:1
             outliersTotalICCScores(threshold, seconds, control+1) = round(ICC([outlierPercentages(testRetestTable.isControl([1:15 17:size(allData,1)]) == control, threshold, seconds, 1) outlierPercentages(testRetestTable.isControl([1:15 17:size(allData,1)]) == control, threshold, seconds, 2)], 'A-1', 0.95), 2, "significant");
         end
@@ -83,13 +84,37 @@ end
 
 outlierRemoved_12_1(:,:) = outlierPercentages(testRetestTable.isControl([1:15, 17:size(allData,1)]) == control,12,1,:);
 
+
+%% cronbach's alpha
+
+allDataCronbach = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
+for threshold = 1:size(allDataCronbach, 1)
+    for seconds = 1:size(allDataCronbach, 2)
+        for control = 0:1
+            allDataCronbach(threshold, seconds, control+1) = round(cronbach([allPercentages(testRetestTable.isControl== control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)]), 2, "significant");
+        end
+    end
+end
+
+%% Pearson Correlation
+
+allDataPearson = nan(size(allPercentages, 2), size(allPercentages, 3), 2);
+for threshold = 1:size(allDataPearson, 1)
+    for seconds = 1:size(allDataPearson, 2)
+        for control = 0:1
+            r = round(corr([allPercentages(testRetestTable.isControl == control, threshold, seconds, 1) allPercentages(testRetestTable.isControl == control, threshold, seconds, 2)]), 2, "significant");
+            allDataPearson(threshold, seconds, control+1) = r(1,2);      
+        end
+    end
+end
+
 %% Plot
 % Create heatmaps to show the results
 xvalues = cellstr(string(1:15));
 yvalues = cellstr(string(15:-1:1));
 
 figure()
-heatmap(xvalues,yvalues,flipud(allDataTotalICCScores(:,:,2)), 'Colormap', parula);
+heatmap(xvalues,yvalues,flipud(allDataTotalICCScores(:,:,1)), 'Colormap', parula);
 xlabel('Min Deviation Time (s)')
 ylabel('Min Deviation Threshold (PD)')
 title('Heatmap with all data')
@@ -99,6 +124,18 @@ heatmap(xvalues,yvalues,flipud(outliersTotalICCScores(:,:,2)), 'Colormap', parul
 xlabel('Min Deviation Time (s)')
 ylabel('Min Deviation Threshold (PD)')
 title('Heatmap with NJIT020 Removed')
+
+figure()
+heatmap(xvalues,yvalues,flipud(allDataCronbach(:,:,2)), 'Colormap', parula);
+xlabel('Min Deviation Time (s)')
+ylabel('Min Deviation Threshold (PD)')
+title('Cronbach Heatmap with all data')
+
+figure()
+heatmap(xvalues,yvalues,flipud(allDataPearson(:,:,2)), 'Colormap', parula);
+xlabel('Min Deviation Time (s)')
+ylabel('Min Deviation Threshold (PD)')
+title('Pearson Heatmap with all data')
 
 
 %% 
@@ -115,5 +152,19 @@ MSC = var(mean(M, 1)) * n;
 MSE = (SStotal - MSR *(n - 1) - MSC * (k -1))/ ((n - 1) * (k - 1));
 
 r = (MSR - MSE) / (MSR + (k-1)*MSE + k*(MSC-MSE)/n)
+
+
+%% 
+SEM = (std(outlierRemoved_12_1, 0, "all")/size(outlierRemoved_12_1, 1))^2;
+S = std(outlierRemoved_12_1, 0, "all")^2;
+
+ICC = 1-(SEM/S)
+
+
+%% Log transformation
+
+
+
+
 
 
