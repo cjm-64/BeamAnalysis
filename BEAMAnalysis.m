@@ -22,15 +22,18 @@ end
 
 %% Prep For Export - BNC v IXT
 
+load isControlList.mat
+
 sourceDirectory = uigetdir('Data\');
 fileList = dir(sourceDirectory);
 numParticipants = strings(length(dir([sourceDirectory, '\BEAM*'])), 1);
-timepoint = zeros(length(dir([sourceDirectory, '\BEAM*'])), 1);
-deviationTimes = zeros(length(dir([sourceDirectory, '\BEAM*'])), 1);
-deviationPercentages = zeros(length(dir([sourceDirectory, '\BEAM*'])), 1);
-deviationMaxes = zeros(length(dir([sourceDirectory, '\BEAM*'])), 1);
-deviationMeans = zeros(length(dir([sourceDirectory, '\BEAM*'])), 1);
-deviationMedians = zeros(length(dir([sourceDirectory, '\BEAM*'])), 1);
+timepoint = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
+isControl = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
+deviationTimes = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
+deviationPercentages = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
+deviationMaxes = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
+deviationMeans = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
+deviationMedians = nan(length(dir([sourceDirectory, '\BEAM*'])), 1);
 writeRowLocation = 1;
 for i = 1:length(fileList)
     loadedFileName = fileList(i).name;
@@ -51,8 +54,11 @@ for i = 1:length(fileList)
     deviationMaxes(writeRowLocation) = deviations.maxSize;
     deviationMeans(writeRowLocation) = deviations.meanSize;
     deviationMedians(writeRowLocation) = deviations.medianSize;
+    isControl(i,writeColLocation) = isControlList.isControl(isControlList.participantName == longitudinalParticipants(i));
+
     writeRowLocation = writeRowLocation + 1;
 end
+
 
 testRetestTable = table(numParticipants, timepoint, deviationTimes, deviationPercentages, deviationMaxes, deviationMeans, deviationMedians);
 writetable(testRetestTable, append(extractBefore(sourceDirectory, 'Data'), 'BNC v IXT Output ', char(datetime("today")), '.csv'))
