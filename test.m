@@ -1128,6 +1128,10 @@ stdFPS = std(allFPS);
 histogram(allFPS)
 sum(isoutlier(allFPS))
 
+SEM = std(allFPS)/sqrt(length(allFPS));               % Standard Error
+ts = tinv([0.025  0.975],length(allFPS)-1);      % T-Score
+CI = avgFPS + ts*SEM;                      % Confidence Intervals
+
 %% Create list of controls and patients
 [filePaths, fileRoot] = uigetfile('Data\Final\*.mat', "MultiSelect","on");
 names = strings(length(filePaths), 1);
